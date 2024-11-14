@@ -1,15 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>data_visualiation</title>
-    </head>
-    <body>
-        <h1>project overview</h1>
-        <h2>data_visualiation</h2>
-        <p>data_visualiation</p>
-    </body>
-    <script src="index.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Most Streamed Songs Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Spotify Most Streamed Songs Dashboard</h1>
+        <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div id="dashboard">
+        <aside id="sidebar">
+            <h2>Filters</h2>
+            <label for="genre">Genre:</label>
+            <select id="genre">
+                <option value="all">All</option>
+                <!-- Add more genres as needed -->
+                <option value="pop">Pop</option>
+                <option value="rock">Rock</option>
+                <option value="hip-hop">Hip-Hop</option>
+                <!-- ... -->
+            </select>
+
+            <label for="artist">Artist:</label>
+            <select id="artist">
+                <option value="all">All</option>
+                <!-- Add more artists as needed -->
+                <option value="artist1">Artist 1</option>
+                <option value="artist2">Artist 2</option>
+                <!-- ... -->
+            </select>
+
+            <label for="date-range">Release Date:</label>
+            <input type="date" id="start-date">
+            to
+            <input type="date" id="end-date">
+
+            <button id="reset-filters">Reset Filters</button>
+        </aside>
+
+        <main id="main-content">
+            <section id="line-chart">
+                <h2>Streaming Trends Over Time</h2>
+                <!-- D3.js Line Chart will be rendered here -->
+            </section>
+
+            <section id="bar-chart">
+                <h2>Top Artists by Total Streams</h2>
+                <!-- D3.js Bar Chart will be rendered here -->
+            </section>
+
+            <section id="pie-chart">
+                <h2>Genre Distribution</h2>
+                <!-- D3.js Pie Chart will be rendered here -->
+            </section>
+
+            <section id="scatter-plot">
+                <h2>Song Length vs. Total Streams</h2>
+                <!-- D3.js Scatter Plot will be rendered here -->
+            </section>
+
+            <section id="heatmap">
+                <h2>Monthly Streaming Activity by Genre</h2>
+                <!-- D3.js Heatmap will be rendered here -->
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        &copy; 2024 Spotify Dashboard. Data sourced from Kaggle.
+    </footer>
+
+    <!-- Link to your script file for D3 visualizations -->
+    <script src="script.js"></script>
+</body>
 </html>

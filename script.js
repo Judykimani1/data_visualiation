@@ -1,10 +1,10 @@
 // Load the dataset
-d3.csv("path/to/Spotify-Most-Streamed-Songs.csv").then(data => {
+d3.csv("./data/smss.csv").then(data => {
     // Process data
     data.forEach(d => {
         d.streams = +d.streams; // Convert streams to number
         d.released_year = +d.released_year; // Convert released year to number
-        d.danceability = +d.danceability_ % / 100; / / Convert danceability percentage to a decimal
+        d.danceability = +d.danceability_ % / 100; / / Convert to a decimal
         d.energy = +d.energy_ % / 100; / / Convert energy percentage to a decimal
         d.acousticness = +d.acousticness_ % / 100; / / Convert acousticness percentage to a decimal
     });

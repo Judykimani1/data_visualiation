@@ -4,82 +4,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotify Most Streamed Songs Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chart-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-2px);
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '▼';
+            font-size: 0.8em;
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #6B7280;
+        }
+
+        select, input[type="date"] {
+            appearance: none;
+            background-color: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.375rem;
+            padding: 0.5rem 2rem 0.5rem 0.75rem;
+            width: 100%;
+            color: #374151;
+        }
+
+        select:focus, input:focus {
+            outline: 2px solid #22C55E;
+            outline-offset: 2px;
+        }
+
+        .bar { transition: fill 0.2s; }
+        .bar:hover { fill: #22C55E; }
+
+        .dot { transition: fill 0.2s; }
+        .dot:hover { fill: #22C55E; }
+
+        .arc { transition: opacity 0.2s; }
+        .arc:hover { opacity: 0.8; }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>Spotify Most Streamed Songs Dashboard</h1>
-        <nav>
-            <a href="#">Home</a>
-            <a href="#">About</a>
-            <a href="#">Contact</a>
-        </nav>
+<body class="bg-gray-50 min-h-screen">
+    <header class="bg-gradient-to-r from-green-600 to-green-400 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl md:text-3xl font-bold text-white">Spotify Analytics Dashboard</h1>
+                <nav class="space-x-6">
+                    <a href="#" class="text-white hover:text-green-200 transition">Home</a>
+                    <a href="#" class="text-white hover:text-green-200 transition">About</a>
+                    <a href="#" class="text-white hover:text-green-200 transition">Contact</a>
+                </nav>
+            </div>
+        </div>
     </header>
 
-    <div id="dashboard">
-        <aside id="sidebar">
-            <h2>Filters</h2>
-            <label for="genre">Genre:</label>
-            <select id="genre">
-                <option value="all">All</option>
-                <!-- Add more genres as needed -->
-                <option value="pop">Pop</option>
-                <option value="rock">Rock</option>
-                <option value="hip-hop">Hip-Hop</option>
-                <!-- ... -->
-            </select>
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Sidebar -->
+            <aside class="lg:w-64 space-y-6 bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold text-gray-800">Filters</h2>
 
-            <label for="artist">Artist:</label>
-            <select id="artist">
-                <option value="all">All</option>
-                <!-- Add more artists as needed -->
-                <option value="artist1">Artist 1</option>
-                <option value="artist2">Artist 2</option>
-                <!-- ... -->
-            </select>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" for="genre">Genre</label>
+                        <div class="select-wrapper">
+                            <select id="genre" class="w-full">
+                                <option value="all">All Genres</option>
+                                <option value="pop">Pop</option>
+                                <option value="rock">Rock</option>
+                                <option value="hip-hop">Hip-Hop</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <label for="date-range">Release Date:</label>
-            <input type="date" id="start-date">
-            to
-            <input type="date" id="end-date">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" for="artist">Artist</label>
+                        <div class="select-wrapper">
+                            <select id="artist" class="w-full">
+                                <option value="all">All Artists</option>
+                                <option value="artist1">Artist 1</option>
+                                <option value="artist2">Artist 2</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <button id="reset-filters">Reset Filters</button>
-        </aside>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Release Date Range</label>
+                        <div class="space-y-2">
+                            <input type="date" id="start-date" class="w-full">
+                            <input type="date" id="end-date" class="w-full">
+                        </div>
+                    </div>
 
-        <main id="main-content">
-            <section id="line-chart">
-                <h2>Streaming Trends Over Time</h2>
-                <!-- D3.js Line Chart will be rendered here -->
-            </section>
+                    <button id="reset-filters" class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                        Reset Filters
+                    </button>
+                </div>
+            </aside>
 
-            <section id="bar-chart">
-                <h2>Top Artists by Total Streams</h2>
-                <!-- D3.js Bar Chart will be rendered here -->
-            </section>
+            <!-- Main Content -->
+            <main class="flex-1 space-y-8">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <section id="line-chart" class="chart-container p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Streaming Trends Over Time</h2>
+                    </section>
 
-            <section id="pie-chart">
-                <h2>Genre Distribution</h2>
-                <!-- D3.js Pie Chart will be rendered here -->
-            </section>
+                    <section id="bar-chart" class="chart-container p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Top Artists by Total Streams</h2>
+                    </section>
 
-            <section id="scatter-plot">
-                <h2>Song Length vs. Total Streams</h2>
-                <!-- D3.js Scatter Plot will be rendered here -->
-            </section>
+                    <section id="pie-chart" class="chart-container p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Genre Distribution</h2>
+                    </section>
 
-            <section id="heatmap">
-                <h2>Monthly Streaming Activity by Genre</h2>
-                <!-- D3.js Heatmap will be rendered here -->
-            </section>
-        </main>
+                    <section id="scatter-plot" class="chart-container p-6">
+                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Song Length vs. Total Streams</h2>
+                    </section>
+                </div>
+
+                <section id="heatmap" class="chart-container p-6">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Monthly Streaming Activity by Genre</h2>
+                </section>
+            </main>
+        </div>
     </div>
 
-    <footer>
-        &copy; 2024 Spotify Dashboard. Data sourced from Kaggle.
+    <footer class="bg-gray-800 text-white py-6 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2024 Spotify Dashboard. Data sourced from Kaggle.</p>
+        </div>
     </footer>
 
-    <!-- Link to your script file for D3 visualizations -->
     <script src="script.js"></script>
 </body>
 </html>

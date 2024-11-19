@@ -1,141 +1,628 @@
-// Load the dataset
-d3.csv("./data/smss.csv").then(data => {
-    // Process data
-    data.forEach(d => {
-        d.streams = +d.streams; // Convert streams to number
-        d.released_year = +d.released_year; // Convert released year to number
-        d.danceability = +d.danceability_ % / 100; / / Convert to a decimal
-        d.energy = +d.energy_ % / 100; / / Convert energy percentage to a decimal
-        d.acousticness = +d.acousticness_ % / 100; / / Convert acousticness percentage to a decimal
-    });
+// Constants for chart dimensions and margins
+const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
+const CHART_WIDTH = 600;
+const CHART_HEIGHT = 400;
+const INNER_WIDTH = CHART_WIDTH - MARGIN.left - MARGIN.right;
+const INNER_HEIGHT = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
 
-    // Create visualizations
-    createLineChart(data);
-    createBarChart(data);
-    createPieChart(data);
-    createScatterPlot(data);
-    createHeatmap(data);
-});
+// Error handling wrapper for data loading
+async function loadData() {
+    try {
+        const data = await d3.csv("./data/smss.csv");
+        if (!data || data.length === 0) {
+            throw new Error("No data loaded");
+        }
 
-// Function to create a Line Chart for Streaming Trends Over Time
+        // Process data
+        data.forEach(d => {
+            d.streams = +d.streams;
+            d.released_year = +d.released_year;
+            d.danceability = parseFloat(d.danceability?.replace('%', '')) / 100 || 0;
+            d.energy = parseFloat(d.energy?.replace('%', '')) / 100 || 0;
+            d.acousticness = parseFloat(d.acousticness?.replace('%', '')) / 100 || 0;
+            d.length = +d.length_minute || 0; // Assuming length is in minutes
+        });
+
+        return data;
+    } catch (error) {
+        console.error("Error loading data:", error);
+        document.querySelectorAll('.chart-container').forEach(container => {
+            container.innerHTML = '<p class="text-red-500">Error loading data. Please try again later.</p>';
+        });
+        return null;
+    }
+}
+
+// Initialize dashboard
+async function initDashboard() {
+    const data = await loadData();
+    if (!data) return;
+
+    // Initialize all charts
+    const charts = {
+        lineChart: createLineChart(data),
+        barChart: createBarChart(data),
+        pieChart: createPieChart(data),
+        scatterPlot: createScatterPlot(data),
+        heatmap: createHeatmap(data)
+    };
+
+    // Set up filter listeners
+    setupFilters(data, charts);
+}
+
 function createLineChart(data) {
-    const svg = d3.select("#line-chart").append("svg").attr("width", 600).attr("height", 400);
+    const svg = d3.select("#line-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
     const x = d3.scaleTime()
         .domain(d3.extent(data, d => new Date(d.released_year, 0)))
-        .range([0, 580]);
+        .range([0, INNER_WIDTH]);
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(data, d => d.streams)])
-        .range([380, 0]);
+        .range([INNER_HEIGHT, 0]);
 
+    // Add line
     const line = d3.line()
         .x(d => x(new Date(d.released_year, 0)))
-        .y(d => y(d.streams));
+        .y(d => y(d.streams))
+        .curve(d3.curveMonotoneX);
 
     svg.append("path")
         .datum(data)
+        .attr("class", "line")
         .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 1.5)
+        .attr("stroke", "#22C55E")
+        .attr("stroke-width", 2)
         .attr("d", line);
 
-    svg.append("g").call(d3.axisBottom(x).ticks(5)).attr("transform", "translate(0,380)");
-    svg.append("g").call(d3.axisLeft(y));
+    // Add axes
+    svg.append("g")
+        .attr("transform", `translate(0,${INNER_HEIGHT})`)
+        .call(d3.axisBottom(x).ticks(5))
+        .selectAll("text")
+        .attr("transform", "rotate(-45)")
+        .style("text-anchor", "end");
+
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    // Add titles
+    svg.append("text")
+        .attr("x", INNER_WIDTH / 2)
+        .attr("y", -MARGIN.top / 2)
+        .attr("text-anchor", "middle")
+        .text("Streaming Trends Over Time")
+        .attr("class", "text-lg font-semibold");
+
+    // Add tooltips
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0)
+        .style("position", "absolute")
+        .style("background-color", "white")
+        .style("border", "1px solid #ddd")
+        .style("padding", "10px")
+        .style("border-radius", "5px");
+
+    // Add interactive dots
+    svg.selectAll(".dot")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .attr("cx", d => x(new Date(d.released_year, 0)))
+        .attr("cy", d => y(d.streams))
+        .attr("r", 5)
+        .style("opacity", 0)
+        .on("mouseover", function(event, d) {
+            d3.select(this).style("opacity", 1);
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+            tooltip.html(`Year: ${d.released_year}<br/>Streams: ${d3.format(",")(d.streams)}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select(this).style("opacity", 0);
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+    return {
+        update: function(filteredData) {
+            // Update the visualization with filtered data
+            const t = d3.transition().duration(750);
+
+            // Update scales
+            x.domain(d3.extent(filteredData, d => new Date(d.released_year, 0)));
+            y.domain([0, d3.max(filteredData, d => d.streams)]);
+
+            // Update line
+            svg.select(".line")
+                .transition(t)
+                .attr("d", line(filteredData));
+
+            // Update axes
+            svg.select(".x-axis").transition(t).call(d3.axisBottom(x));
+            svg.select(".y-axis").transition(t).call(d3.axisLeft(y));
+        }
+    };
 }
 
-// Function to create a Bar Chart for Top Artists by Total Streams
 function createBarChart(data) {
-    const artistData = d3.rollup(data, v => d3.sum(v, d => d.streams), d => d.artist_name);
-    const sortedArtists = Array.from(artistData.entries()).sort((a, b) => b[1] - a[1]).slice(0, 10);
+    // Similar structure to line chart, with bars instead of lines
+    // Implementation details...
 
-    const svg = d3.select("#bar-chart").append("svg").attr("width", 600).attr("height", 400);
+    // Grouped data by artist
+    const artistData = d3.rollup(data,
+        v => d3.sum(v, d => d.streams),
+        d => d.artist_name
+    );
+
+    const sortedArtists = Array.from(artistData.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 10);
+
+    const svg = d3.select("#bar-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
     const x = d3.scaleBand()
         .domain(sortedArtists.map(d => d[0]))
-        .range([0, 580])
+        .range([0, INNER_WIDTH])
         .padding(0.1);
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(sortedArtists, d => d[1])])
-        .range([380, 0]);
+        .range([INNER_HEIGHT, 0]);
 
+    // Add bars
     svg.selectAll(".bar")
         .data(sortedArtists)
-        .enter().append("rect")
+        .enter()
+        .append("rect")
         .attr("class", "bar")
         .attr("x", d => x(d[0]))
         .attr("y", d => y(d[1]))
         .attr("width", x.bandwidth())
-        .attr("height", d => 380 - y(d[1]))
-        .attr("fill", "orange");
+        .attr("height", d => INNER_HEIGHT - y(d[1]))
+        .attr("fill", "#22C55E");
 
-    svg.append("g").call(d3.axisBottom(x)).attr("transform", "translate(0,380)");
-    svg.append("g").call(d3.axisLeft(y));
+    // Add axes
+    svg.append("g")
+        .attr("transform", `translate(0,${INNER_HEIGHT})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "rotate(-45)")
+        .style("text-anchor", "end");
+
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    return {
+        update: function(filteredData) {
+            // Update implementation
+        }
+    };
 }
 
-// Function to create a Pie Chart for Genre Distribution
 function createPieChart(data) {
-    const genreData = d3.rollup(data, v => v.length, d => d.genre); // Assuming genre is in your dataset
+    const width = 300;
+    const height = 300;
+    const radius = Math.min(width, height) / 2;
+
+    const genreData = d3.rollup(data,
+        v => v.length,
+        d => d.genre || 'Unknown'
+    );
 
     const pieData = Array.from(genreData.entries());
 
-    const width = 300;
-    const height = 300;
-
-    const radius = Math.min(width, height) / 2;
+    const svg = d3.select("#pie-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .append("g")
+        .attr("transform", `translate(${width/2},${height/2})`);
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    const pie = d3.pie().value(d => d[1]);
+    const pie = d3.pie()
+        .value(d => d[1])
+        .sort(null);
 
-    const arc = d3.arc().innerRadius(0).outerRadius(radius);
+    const arc = d3.arc()
+        .innerRadius(radius * 0.3)
+        .outerRadius(radius * 0.8);
 
-    const svg = d3.select("#pie-chart").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", `translate(${width / 2}, ${height / 2})`);
+    const outerArc = d3.arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9);
 
-    svg.selectAll(".arc")
+    // Add the arcs
+    const paths = svg.selectAll('path')
         .data(pie(pieData))
-        .enter().append("path")
-        .attr("class", "arc")
-        .attr("d", arc)
-        .style("fill", (d) => color(d.data[0]));
+        .enter()
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', d => color(d.data[0]))
+        .attr('stroke', 'white')
+        .style('stroke-width', '2px');
 
+    // Add labels
+    const labels = svg.selectAll('text')
+        .data(pie(pieData))
+        .enter()
+        .append('text')
+        .attr('transform', d => {
+            const pos = outerArc.centroid(d);
+            return `translate(${pos})`;
+        })
+        .style('text-anchor', 'middle')
+        .text(d => d.data[0]);
+
+    return {
+        update: function(filteredData) {
+            // Update implementation
+        }
+    };
 }
 
-// Function to create a Scatter Plot for Song Length vs. Total Streams
 function createScatterPlot(data) {
-    const svg = d3.select("#scatter-plot").append("svg").attr("width", 600).attr("height", 400);
+    const svg = d3.select("#scatter-plot")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
     const x = d3.scaleLinear()
-        .domain([0, d3.max(data, d => +d.length)]) // Assuming length is in your dataset
-        .range([40, 580]);
+        .domain([0, d3.max(data, d => d.length)])
+        .range([0, INNER_WIDTH]);
 
     const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => +d.streams)])
-        .range([380, 20]);
+        .domain([0, d3.max(data, d => d.streams)])
+        .range([INNER_HEIGHT, 0]);
 
+    // Add dots
     svg.selectAll(".dot")
         .data(data)
-        .enter().append("circle")
+        .enter()
+        .append("circle")
         .attr("class", "dot")
-        .attr("cx", (d) => x(+d.length))
-        .attr("cy", (d) => y(+d.streams))
-        .attr("r", 5)
-        .style("fill", "purple");
+        .attr("cx", d => x(d.length))
+        .attr("cy", d => y(d.streams))
+        .attr("r", 4)
+        .style("fill", "#22C55E")
+        .style("opacity", 0.6);
 
-    svg.append("g").call(d3.axisBottom(x).ticks(5)).attr("transform", "translate(0,380)");
-    svg.append("g").call(d3.axisLeft(y));
+    // Add axes
+    svg.append("g")
+        .attr("transform", `translate(0,${INNER_HEIGHT})`)
+        .call(d3.axisBottom(x));
+
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    return {
+        update: function(filteredData) {
+            // Update implementation
+        }
+    };
 }
 
-// Function to create a Heatmap for Monthly Streaming Activity by Genre
 function createHeatmap(data) {
-    // Prepare data for heatmap (this may require additional processing depending on your dataset structure)
-    // Here we assume you have a monthly streaming count per genre
+    // Group data by month and genre
+    const months = d3.range(12);
+    const genres = Array.from(new Set(data.map(d => d.genre)));
 
-    // This is just a placeholder function; you will need to implement the heatmap logic based on your dataset.
-    console.log('Heatmap function needs implementation based on specific data structure.');
+    // Create heatmap data structure
+    const heatmapData = [];
+    genres.forEach(genre => {
+        months.forEach(month => {
+            const streams = data
+                .filter(d => d.genre === genre && new Date(d.released_date).getMonth() === month)
+                .reduce((sum, d) => sum + d.streams, 0);
+            heatmapData.push({
+                genre,
+                month,
+                streams
+            });
+        });
+    });
+
+    const svg = d3.select("#heatmap")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+    const x = d3.scaleBand()
+        .domain(months)
+        .range([0, INNER_WIDTH])
+        .padding(0.1);
+
+    const y = d3.scaleBand()
+        .domain(genres)
+        .range([0, INNER_HEIGHT])
+        .padding(0.1);
+
+    const color = d3.scaleSequential()
+        .domain([0, d3.max(heatmapData, d => d.streams)])
+        .interpolator(d3.interpolateGreens);
+
+    // Add cells
+    svg.selectAll("rect")
+        .data(heatmapData)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d.month))
+        .attr("y", d => y(d.genre))
+        .attr("width", x.bandwidth())
+        .attr("height", y.bandwidth())
+        .style("fill", d => color(d.streams));
+
+    // Add axes
+    svg.append("g")
+        .attr("transform", `translate(0,${INNER_HEIGHT})`)
+        .call(d3.axisBottom(x)
+            .tickFormat(m => d3.timeFormat("%b")(new Date(2024, m))));
+
+    svg.append("g")
+        .call(d3.axisLeft(y));
+
+    return {
+        update: function(filteredData) {
+            // Update implementation
+        }
+    };
 }
+
+function setupFilters(data, charts) {
+    // Genre filter
+    const genreSelect = document.getElementById('genre');
+    const genres = ['All Genres', ...new Set(data.map(d => d.genre))];
+    genres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+    });
+
+    // Artist filter
+    const artistSelect = document.getElementById('artist');
+    const artists = ['All Artists', ...new Set(data.map(d => d.artist_name))];
+    artists.forEach(artist => {
+        const option = document.createElement('option');
+        option.value = artist;
+        option.textContent = artist;
+        artistSelect.appendChild(option);
+    });
+
+    // Filter change handler
+    function handleFilterChange() {
+        const selectedGenre = genreSelect.value;
+        const selectedArtist = artistSelect.value;
+        const filteredData = data.filter(d => {
+            return selectedGenre === 'All Genres' || d.genre === selectedGenre;
+        }).filter(d => {
+            return selectedArtist === 'All Artists' || d.artist_name === selectedArtist;
+        });
+        charts.lineChart.update(filteredData);
+        charts.barChart.update(filteredData);
+        charts.pieChart.update(filteredData);
+        charts.scatterPlot.update(filteredData);
+        charts.heatmap.update(filteredData);
+    }
+
+    genreSelect.addEventListener('change', handleFilterChange);
+    artistSelect.addEventListener('change', handleFilterChange);
+}
+
+// Sample dataset structure for Spotify Most Streamed Songs
+const SAMPLE_DATA = [
+    {
+        "track_name": "Shape of You",
+        "artist_name": "Ed Sheeran",
+        "released_date": "2017-01-06",
+        "streams": 3270283771,
+        "duration_ms": 233713,
+        "genre": "pop"
+    }
+    // ... more entries
+];
+
+// Utility functions
+const formatNumber = d3.format(",");
+const formatDate = d3.timeFormat("%Y-%m-%d");
+const parseDate = d3.timeParse("%Y-%m-%d");
+
+// Error handling wrapper for data loading
+async function loadData() {
+    try {
+        const data = await d3.csv("https://raw.githubusercontent.com/datasets/spotify-most-streamed/main/data/spotify-most-streamed.csv");
+        if (!data || data.length === 0) {
+            throw new Error("No data loaded");
+        }
+
+        // Process data
+        return data.map(d => ({
+            track_name: d.track_name,
+            artist_name: d.artist_name,
+            released_date: parseDate(d.released_date),
+            streams: +d.streams,
+            duration_ms: +d.duration_ms,
+            genre: d.genre || 'Unknown',
+            duration_min: (+d.duration_ms / 60000).toFixed(2)
+        }));
+    } catch (error) {
+        console.error("Error loading data:", error);
+        // Display error message in chart containers
+        document.querySelectorAll('.chart-container').forEach(container => {
+            container.innerHTML = `
+                <div class="flex items-center justify-center h-full">
+                    <div class="text-red-500 text-center">
+                        <p class="font-semibold">Error loading data</p>
+                        <p class="text-sm">Using sample dataset instead</p>
+                    </div>
+                </div>
+            `;
+        });
+        // Return sample data as fallback
+        return SAMPLE_DATA;
+    }
+}
+
+// Initialize dashboard
+async function initDashboard() {
+    const data = await loadData();
+    if (!data) return;
+
+    // Initialize all charts
+    const charts = {
+        lineChart: createLineChart(data),
+        barChart: createBarChart(data),
+        pieChart: createPieChart(data),
+        scatterPlot: createScatterPlot(data),
+        heatmap: createHeatmap(data)
+    };
+
+    // Set up filter listeners
+    setupFilters(data, charts);
+
+    // Make charts responsive
+    makeChartsResponsive(charts);
+}
+
+// Previous chart creation functions remain the same...
+
+function setupFilters(data, charts) {
+    // Genre filter
+    const genreSelect = document.getElementById('genre');
+    const genres = ['All Genres', ...new Set(data.map(d => d.genre))].sort();
+    genres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+    });
+
+    // Artist filter
+    const artistSelect = document.getElementById('artist');
+    const artists = ['All Artists', ...new Set(data.map(d => d.artist_name))].sort();
+    artists.forEach(artist => {
+        const option = document.createElement('option');
+        option.value = artist;
+        option.textContent = artist;
+        artistSelect.appendChild(option);
+    });
+
+    // Date range inputs
+    const startDate = document.getElementById('start-date');
+    const endDate = document.getElementById('end-date');
+    const dates = data.map(d => d.released_date).sort(d3.ascending);
+    startDate.value = formatDate(dates[0]);
+    endDate.value = formatDate(dates[dates.length - 1]);
+
+    // Filter change handler
+    function handleFilterChange() {
+        const selectedGenre = genreSelect.value;
+        const selectedArtist = artistSelect.value;
+        const startDateVal = parseDate(startDate.value);
+        const endDateVal = parseDate(endDate.value);
+
+        const filteredData = data.filter(d => {
+            const genreMatch = selectedGenre === 'All Genres' || d.genre === selectedGenre;
+            const artistMatch = selectedArtist === 'All Artists' || d.artist_name === selectedArtist;
+            const dateMatch = d.released_date >= startDateVal && d.released_date <= endDateVal;
+            return genreMatch && artistMatch && dateMatch;
+        });
+
+        // Update all charts with filtered data
+        Object.values(charts).forEach(chart => chart.update(filteredData));
+    }
+
+    // Add event listeners
+    genreSelect.addEventListener('change', handleFilterChange);
+    artistSelect.addEventListener('change', handleFilterChange);
+    startDate.addEventListener('change', handleFilterChange);
+    endDate.addEventListener('change', handleFilterChange);
+
+    // Reset filters button
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        genreSelect.value = 'All Genres';
+        artistSelect.value = 'All Artists';
+        startDate.value = formatDate(dates[0]);
+        endDate.value = formatDate(dates[dates.length - 1]);
+        handleFilterChange();
+    });
+}
+
+function makeChartsResponsive(charts) {
+    function updateChartDimensions() {
+        const chartContainers = document.querySelectorAll('.chart-container');
+        chartContainers.forEach(container => {
+            const width = container.clientWidth;
+            const height = Math.min(width * 0.6, 400); // Keep aspect ratio with max height
+
+            const svg = container.querySelector('svg');
+            if (svg) {
+                svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+                svg.setAttribute('width', width);
+                svg.setAttribute('height', height);
+            }
+        });
+    }
+
+    // Add resize listener
+    window.addEventListener('resize', debounce(updateChartDimensions, 250));
+
+    // Initial update
+    updateChartDimensions();
+}
+
+// Utility function for debouncing resize events
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Add loading state handling
+function showLoading() {
+    document.querySelectorAll('.chart-container').forEach(container => {
+        container.innerHTML = `
+            <div class="flex items-center justify-center h-full">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+            </div>
+        `;
+    });
+}
+
+function hideLoading() {
+    document.querySelectorAll('.chart-container').forEach(container => {
+        const loader = container.querySelector('div');
+        if (loader) {
+            loader.remove();
+        }
+    });
+}
+
+// Initialize the dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    showLoading();
+    initDashboard().then(hideLoading);
+});

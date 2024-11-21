@@ -435,8 +435,15 @@ const SAMPLE_DATA = [
         "streams": 3270283771,
         "duration_ms": 233713,
         "genre": "pop"
+    },
+    {
+        "track_name": "Blinding Lights",
+        "artist_name": "The Weeknd",
+        "released_date": "2019-11-29",
+        "streams": 3024354847,
+        "duration_ms": 200040,
+        "genre": "pop"
     }
-    // ... more entries
 ];
 
 // Utility functions
@@ -447,16 +454,26 @@ const parseDate = d3.timeParse("%Y-%m-%d");
 // Error handling wrapper for data loading
 async function loadData() {
     try {
-        const data = await d3.csv("https://raw.githubusercontent.com/datasets/spotify-most-streamed/main/data/spotify-most-streamed.csv");
+        // First try loading from local CSV
+        let data = await d3.csv("./data/smss.csv").catch(() => null);
+
+        // If local CSV fails, try loading from GitHub
+        if (!data) {
+            console.log("Local CSV not found, trying GitHub source...");
+            data = await d3.csv("https://raw.githubusercontent.com/datasets/spotify-most-streamed/main/data/spotify-most-streamed.csv");
+        }
+
+        // If both fail, use sample data
         if (!data || data.length === 0) {
-            throw new Error("No data loaded");
+            console.log("Using sample data as fallback");
+            data = SAMPLE_DATA;
         }
 
         // Process data
         return data.map(d => ({
             track_name: d.track_name,
             artist_name: d.artist_name,
-            released_date: parseDate(d.released_date),
+            released_date: parseDate(d.released_date) || new Date(d.released_date),
             streams: +d.streams,
             duration_ms: +d.duration_ms,
             genre: d.genre || 'Unknown',
@@ -464,19 +481,13 @@ async function loadData() {
         }));
     } catch (error) {
         console.error("Error loading data:", error);
-        // Display error message in chart containers
-        document.querySelectorAll('.chart-container').forEach(container => {
-            container.innerHTML = `
-                <div class="flex items-center justify-center h-full">
-                    <div class="text-red-500 text-center">
-                        <p class="font-semibold">Error loading data</p>
-                        <p class="text-sm">Using sample dataset instead</p>
-                    </div>
-                </div>
-            `;
-        });
-        // Return sample data as fallback
-        return SAMPLE_DATA;
+        // Use sample data as fallback
+        console.log("Using sample data due to error");
+        return SAMPLE_DATA.map(d => ({
+            ...d,
+            released_date: parseDate(d.released_date) || new Date(d.released_date),
+            duration_min: (+d.duration_ms / 60000).toFixed(2)
+        }));
     }
 }
 
@@ -501,7 +512,6 @@ async function initDashboard() {
     makeChartsResponsive(charts);
 }
 
-// Previous chart creation functions remain the same...
 
 function setupFilters(data, charts) {
     // Genre filter

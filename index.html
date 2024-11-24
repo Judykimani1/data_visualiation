@@ -4,8 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Spotify Analytics</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/dist/styles.css" rel="stylesheet" />
     <style>
+      .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #22c55e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .chart-container svg {
+        width: 100%;
+        height: 100%;
+      }
       .chart-container {
         background: white;
         border-radius: 12px;
@@ -117,9 +138,6 @@
               <div class="select-wrapper">
                 <select id="genre" class="w-full">
                   <option value="all">All Genres</option>
-                  <option value="pop">Pop</option>
-                  <option value="rock">Rock</option>
-                  <option value="hip-hop">Hip-Hop</option>
                 </select>
               </div>
             </div>
@@ -133,8 +151,6 @@
               <div class="select-wrapper">
                 <select id="artist" class="w-full">
                   <option value="all">All Artists</option>
-                  <option value="artist1">Artist 1</option>
-                  <option value="artist2">Artist 2</option>
                 </select>
               </div>
             </div>
@@ -165,24 +181,28 @@
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Streaming Trends Over Time
               </h2>
+              <div class="loading-state">
             </section>
 
             <section id="bar-chart" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Top Artists by Total Streams
               </h2>
+              <div class="loading-state">
             </section>
 
             <section id="pie-chart" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Genre Distribution
               </h2>
+              <div class="loading-state">
             </section>
 
             <section id="scatter-plot" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Song Length vs. Total Streams
               </h2>
+              <div class="loading-state">
             </section>
           </div>
 
@@ -190,6 +210,7 @@
             <h2 class="text-lg font-semibold text-gray-800 mb-4">
               Monthly Streaming Activity by Genre
             </h2>
+            <div class="loading-state">
           </section>
         </main>
       </div>
@@ -197,9 +218,15 @@
 
     <footer class="bg-gray-800 text-white py-6 mt-12">
       <div class="container mx-auto px-4 text-center">
-        <p>&copy; 2024 Spotify Dashboard. Data sourced from Kaggle.</p>
+        <p>&copy; 2024 Spotify Analytics. Data sourced from Kaggle.</p>
       </div>
     </footer>
+    <script>
+      d3.select("body").append("p").text("D3 is working, Ser Mike!");
+    </script>
+
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
 
     <script src="script.js"></script>
   </body>

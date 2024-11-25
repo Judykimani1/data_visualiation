@@ -1,5 +1,4 @@
 import * as d3 from 'd3';
-
 // Constants for chart dimensions and margins
 const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
 const CHART_WIDTH = 600;

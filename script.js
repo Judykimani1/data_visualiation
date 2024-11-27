@@ -6,20 +6,12 @@ const CHART_WIDTH = 600;
 const CHART_HEIGHT = 400;
 const INNER_WIDTH = CHART_WIDTH - MARGIN.left - MARGIN.right;
 const INNER_HEIGHT = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
+
 // Utility functions
+const formatDate = d3.timeFormat("%Y-%m-%d");
+const parseDate = d3.timeParse("%Y-%m-%d");
 
-const formatDate = (date) => {
-    if (!date || !(date instanceof Date) || isNaN(date.getTime())) return '';
-    return date.toISOString().split('T')[0];
-  };
-
-const parseDate = (dateString) => {
-    if (!dateString) return null;
-    const date = new Date(dateString);
-    return isNaN(date.getTime()) ? null : date;
-};
-
-// Loading state handling functions - Define these BEFORE they're used
+// Loading state handling functions
 function showLoading() {
     document.querySelectorAll('.chart-container').forEach(container => {
         container.innerHTML = `
@@ -39,60 +31,29 @@ function hideLoading() {
     });
 }
 
-// Sample dataset structure
-const SAMPLE_DATA = [
-    {
-        "track_name": "Shape of You",
-        "artist_name": "Ed Sheeran",
-        "released_date": "2017-01-06",
-        "streams": 3270283771,
-        "duration_ms": 233713,
-        "genre": "pop"
-    },
-    {
-        "track_name": "Blinding Lights",
-        "artist_name": "The Weeknd",
-        "released_date": "2019-11-29",
-        "streams": 3024354847,
-        "duration_ms": 200040,
-        "genre": "pop"
-    }
-];
-
 // Error handling wrapper for data loading
 async function loadData() {
     try {
-        // First try loading from local CSV
-        let data = await d3.csv("./data/smss.csv").catch(() => null);
+        const response = await fetch("./data/smss.csv");
+        const csvData = await response.text();
 
-        // If local CSV fails, try loading from GitHub
-        if (!data) {
-            console.log("Local CSV not found, trying GitHub source...");
-            data = await d3.csv("https://raw.githubusercontent.com/Judykimani1/data_visualization/refs/heads/master/data/smss.csv");
-        }
-
-        // If both fail, use sample data
-        if (!data || data.length === 0) {
-            console.log("Using sample data as fallback");
-            data = SAMPLE_DATA;
-        }
-
-        // Process data
-        return data.map(d => {
-            const released_date = parseDate(d.released_date);
-            if (!released_date) {
-                console.warn(`Invalid date found: ${d.released_date}`);
-            }
-            return {
-            track_name: d.track_name || 'Unknown Track',
-            artist_name: d.artist_name || 'Unknown Artist',
-            released_date: released_date || new Date(),
-            streams: parseInt(d.streams) || 0,
-            duration_ms: parseInt(d.duration_ms) || 0,
+        const data = d3.csvParse(csvData, d => ({
+            track_name: d.track_name,
+            artist_name: d['artist(s)_name'],
+            released_date: parseDate(d.released_year + '-' + d.released_month + '-' + d.released_day),
+            streams: +d.streams,
+            duration_ms: +d.duration_ms,
             genre: d.genre || 'Unknown',
-            duration_min: (parseInt(d.duration_ms || 0) / 60000).toFixed(2)
-            };
-        }).filter(d => d.released_date instanceof Date && !isNaN(d.released_date.getDate()));
+            danceability: +d['danceability_%'],
+            valence: +d['valence_%'],
+            energy: +d['energy_%'],
+            acousticness: +d['acousticness_%'],
+            instrumentalness: +d['instrumentalness_%'],
+            liveness: +d['liveness_%'],
+            speechiness: +d['speechiness_%']
+        }));
+
+        return data;
     } catch (error) {
         console.error("Error loading data:", error);
         return [];
@@ -125,15 +86,12 @@ function makeChartsResponsive(charts) {
                 svg.setAttribute('width', width);
                 svg.setAttribute('height', height);
 
+                const chartId = container.id;
+                if (charts[chartId] && typeof charts[chartId].resize === 'function') {
+                    charts[chartId].resize(width, height);
                 }
-        });
-
-        Object.entries(charts).forEach(([key, chart]) => {
-            if (chart && typeof chart.update === 'function' && chart.currentData) {
-                chart.update(chart.currentData);
             }
         });
-
     }
 
     window.addEventListener('resize', debounce(updateChartDimensions, 250));
@@ -146,7 +104,7 @@ async function initDashboard() {
         showLoading();
         const data = await loadData();
 
-        if (!data) {
+        if (!data || data.length === 0) {
             throw new Error("No data available");
         }
 
@@ -156,7 +114,10 @@ async function initDashboard() {
             barChart: createBarChart(data),
             pieChart: createPieChart(data),
             scatterPlot: createScatterPlot(data),
-            heatmap: createHeatmap(data)
+            heatmap: createHeatmap(data),
+            bubbleChart: createBubbleChart(data),
+            spiderChart: createSpiderChart(data),
+            radarChart: createRadarChart(data)
         };
 
         // Set up filter listeners
@@ -180,245 +141,572 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
 });
 
-function createLineChart(data) {
-    if (!data || !data.length) {
-        console.warn('No data provided for line chart');
-        return { update: () => {} };
+// Filter setup function
+function setupFilters(data, charts) {
+    const genreSelect = document.getElementById('genre');
+    const artistSelect = document.getElementById('artist');
+    const startDate = document.getElementById('start-date');
+    const endDate = document.getElementById('end-date');
+
+    // Populate filter options
+    const genres = ['All Genres', ...new Set(data.map(d => d.genre))].sort();
+    const artists = ['All Artists', ...new Set(data.map(d => d.artist_name))].sort();
+
+    genres.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+    });
+
+    artists.forEach(artist => {
+        const option = document.createElement('option');
+        option.value = artist;
+        option.textContent = artist;
+        artistSelect.appendChild(option);
+    });
+
+    // Set initial date range
+    const dates = data.map(d => d.released_date).sort(d3.ascending);
+    startDate.value = formatDate(dates[0]);
+    endDate.value = formatDate(dates[dates.length - 1]);
+
+    // Filter change handler
+    function handleFilterChange() {
+        const selectedGenre = genreSelect.value;
+        const selectedArtist = artistSelect.value;
+        const startDateVal = parseDate(startDate.value);
+        const endDateVal = parseDate(endDate.value);
+
+        const filteredData = data.filter(d => {
+            const genreMatch = selectedGenre === 'All Genres' || d.genre === selectedGenre;
+            const artistMatch = selectedArtist === 'All Artists' || d.artist_name === selectedArtist;
+            const dateMatch = d.released_date >= startDateVal && d.released_date <= endDateVal;
+            return genreMatch && artistMatch && dateMatch;
+        });
+
+        // Update all charts with filtered data
+        Object.values(charts).forEach(chart => chart.update(filteredData));
     }
 
+    // Add event listeners
+    genreSelect.addEventListener('change', handleFilterChange);
+    artistSelect.addEventListener('change', handleFilterChange);
+    startDate.addEventListener('change', handleFilterChange);
+    endDate.addEventListener('change', handleFilterChange);
+
+    // Reset filters button
+    document.getElementById('reset-filters').addEventListener('click', () => {
+        genreSelect.value = 'All Genres';
+        artistSelect.value = 'All Artists';
+        startDate.value = formatDate(dates[0]);
+        endDate.value = formatDate(dates[dates.length - 1]);
+        handleFilterChange();
+    });
+}
+
+// Implement the new chart functions
+function createBubbleChart(data) {
+    const svg = d3.select("#bubble-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
+
+    const x = d3.scaleLinear().range([0, INNER_WIDTH]);
+    const y = d3.scaleLinear().range([INNER_HEIGHT, 0]);
+    const size = d3.scaleLinear().range([4, 40]);
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    function updateChart(filteredData) {
+        const artistData = d3.rollup(filteredData,
+            v => ({
+                totalStreams: d3.sum(v, d => d.streams),
+                avgDanceability: d3.mean(v, d => d.danceability),
+                songCount: v.length
+            }),
+            d => d.artist_name
+        );
+
+        const bubbleData = Array.from(artistData, ([name, values]) => ({
+            name,
+            ...values
+        })).sort((a, b) => b.totalStreams - a.totalStreams).slice(0, 20);
+
+        x.domain([0, d3.max(bubbleData, d => d.avgDanceability)]);
+        y.domain([0, d3.max(bubbleData, d => d.totalStreams)]);
+        size.domain([0, d3.max(bubbleData, d => d.songCount)]);
+
+        const bubbles = svg.selectAll(".bubble")
+            .data(bubbleData, d => d.name);
+
+        bubbles.exit().remove();
+
+        bubbles.enter()
+            .append("circle")
+            .attr("class", "bubble")
+            .merge(bubbles)
+            .transition()
+            .duration(1000)
+            .attr("cx", d => x(d.avgDanceability))
+            .attr("cy", d => y(d.totalStreams))
+            .attr("r", d => size(d.songCount))
+            .attr("fill", d => color(d.name))
+            .attr("opacity", 0.7);
+
+        svg.selectAll(".bubble-label")
+            .data(bubbleData, d => d.name)
+            .join("text")
+            .attr("class", "bubble-label")
+            .attr("x", d => x(d.avgDanceability))
+            .attr("y", d => y(d.totalStreams))
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "middle")
+            .text(d => d.name)
+            .style("font-size", "10px")
+            .style("fill", "white");
+
+        svg.selectAll(".axis").remove();
+
+        svg.append("g")
+            .attr("class", "axis")
+            .attr("transform", `translate(0,${INNER_HEIGHT})`)
+            .call(d3.axisBottom(x).ticks(5));
+
+        svg.append("g")
+            .attr("class", "axis")
+            .call(d3.axisLeft(y).ticks(5));
+
+        svg.append("text")
+            .attr("class", "axis-label")
+            .attr("x", INNER_WIDTH / 2)
+            .attr("y", INNER_HEIGHT + MARGIN.bottom - 10)
+            .style("text-anchor", "middle")
+            .text("Average Danceability");
+
+        svg.append("text")
+            .attr("class", "axis-label")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -INNER_HEIGHT / 2)
+            .attr("y", -MARGIN.left + 20)
+            .style("text-anchor", "middle")
+            .text("Total Streams");
+    }
+
+    updateChart(data);
+
+    return {
+        update: updateChart
+    };
+}
+
+function createSpiderChart(data) {
+    const svg = d3.select("#spider-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${CHART_WIDTH/2},${CHART_HEIGHT/2})`);
+
+    const features = ["danceability", "valence", "energy", "acousticness", "instrumentalness", "liveness", "speechiness"];
+    const radialScale = d3.scaleLinear().domain([0, 100]).range([0, INNER_WIDTH/2]);
+    const angleSlice = Math.PI * 2 / features.length;
+
+    function getPathCoordinates(dataPoint){
+        return features.map((feature, i) => {
+            const angle = angleSlice * i;
+            return {
+                x: radialScale(dataPoint[feature]) * Math.cos(angle - Math.PI/2),
+                y: radialScale(dataPoint[feature]) * Math.sin(angle - Math.PI/2)
+            };
+        });
+    }
+
+    function updateChart(filteredData) {
+        const averageData = features.reduce((acc, feature) => {
+            acc[feature] = d3.mean(filteredData, d => d[feature]);
+            return acc;
+        }, {});
+
+        svg.selectAll("*").remove();
+
+        // Draw circular grid
+        const circles = [20, 40, 60, 80, 100];
+        svg.selectAll(".circular-grid")
+            .data(circles)
+            .enter()
+            .append("circle")
+            .attr("class", "circular-grid")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", d => radialScale(d))
+            .attr("fill", "none")
+            .attr("stroke", "gray")
+            .attr("stroke-dasharray", "4 4");
+
+        // Draw axis
+        features.forEach((feature, i) => {
+            const angle = angleSlice * i - Math.PI/2;
+            const lineCoords = {
+                x2: radialScale(100) * Math.cos(angle),
+                y2: radialScale(100) * Math.sin(angle)
+            };
+
+            svg.append("line")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", lineCoords.x2)
+                .attr("y2", lineCoords.y2)
+                .attr("stroke", "gray");
+
+            svg.append("text")
+                .attr("x", lineCoords.x2 * 1.1)
+                .attr("y", lineCoords.y2 * 1.1)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .text(feature);
+        });
+
+        // Draw spider chart
+        const lineGenerator = d3.line()
+            .x(d => d.x)
+            .y(d => d.y);
+
+        const coordinates = getPathCoordinates(averageData);
+
+        svg.append("path")
+            .datum(coordinates)
+            .attr("d", lineGenerator)
+            .attr("stroke-width", 3)
+            .attr("stroke", "rgba(34, 197, 94, 0.7)")
+            .attr("fill", "rgba(34, 197, 94, 0.2)")
+            .attr("stroke-linejoin", "round");
+    }
+
+    updateChart(data);
+
+    return {
+        update: updateChart
+    };
+}
+
+function createRadarChart(data) {
+    const svg = d3.select("#radar-chart")
+        .append("svg")
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
+        .append("g")
+        .attr("transform", `translate(${CHART_WIDTH/2},${CHART_HEIGHT/2})`);
+
+    const features = ["danceability", "valence", "energy", "acousticness", "instrumentalness", "liveness", "speechiness"];
+
+    const radialScale = d3.scaleLinear().domain([0, 100]).range([0, INNER_WIDTH/2]);
+    const angleSlice = Math.PI * 2 / features.length;
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    function getPathCoordinates(dataPoint){
+        return features.map((feature, i) => {
+            const angle = angleSlice * i;
+            return {
+                x: radialScale(dataPoint[feature]) * Math.cos(angle - Math.PI/2),
+                y: radialScale(dataPoint[feature]) * Math.sin(angle - Math.PI/2)
+            };
+        });
+    }
+
+    function updateChart(filteredData) {
+        const genreData = d3.group(filteredData, d => d.genre);
+        const topGenres = Array.from(genreData, ([genre, songs]) => ({
+            genre,
+            totalStreams: d3.sum(songs, s => s.streams)
+        }))
+        .sort((a, b) => b.totalStreams - a.totalStreams)
+        .slice(0, 5)
+        .map(d => d.genre);
+
+        const averageData = topGenres.map(genre => {
+            const genreSongs = genreData.get(genre);
+            return {
+                genre,
+                ...features.reduce((acc, feature) => {
+                    acc[feature] = d3.mean(genreSongs, d => d[feature]);
+                    return acc;
+                }, {})
+            };
+        });
+
+        svg.selectAll("*").remove();
+
+        // Draw circular grid
+        const circles = [20, 40, 60, 80, 100];
+        svg.selectAll(".circular-grid")
+            .data(circles)
+            .enter()
+            .append("circle")
+            .attr("class", "circular-grid")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", d => radialScale(d))
+            .attr("fill", "none")
+            .attr("stroke", "gray")
+            .attr("stroke-dasharray", "4 4");
+
+        // Draw axis
+        features.forEach((feature, i) => {
+            const angle = angleSlice * i - Math.PI/2;
+            const lineCoords = {
+                x2: radialScale(100) * Math.cos(angle),
+                y2: radialScale(100) * Math.sin(angle)
+            };
+
+            svg.append("line")
+                .attr("x1", 0)
+                .attr("y1", 0)
+                .attr("x2", lineCoords.x2)
+                .attr("y2", lineCoords.y2)
+                .attr("stroke", "gray");
+
+            svg.append("text")
+                .attr("x", lineCoords.x2 * 1.1)
+                .attr("y", lineCoords.y2 * 1.1)
+                .attr("text-anchor", "middle")
+                .attr("dominant-baseline", "middle")
+                .text(feature);
+        });
+
+        // Draw radar chart for each genre
+        const lineGenerator = d3.line()
+            .x(d => d.x)
+            .y(d => d.y);
+
+        averageData.forEach((genreData, i) => {
+            const coordinates = getPathCoordinates(genreData);
+
+            svg.append("path")
+                .datum(coordinates)
+                .attr("d", lineGenerator)
+                .attr("stroke-width", 2)
+                .attr("stroke", color(i))
+                .attr("fill", color(i))
+                .attr("fill-opacity", 0.1)
+                .attr("stroke-linejoin", "round");
+        });
+
+        // Add legend
+        const legend = svg.selectAll(".legend")
+            .data(averageData)
+            .enter()
+            .append("g")
+            .attr("class", "legend")
+            .attr("transform", (d, i) => `translate(${INNER_WIDTH/2 + 20}, ${-INNER_HEIGHT/2 + 20 + i * 20})`);
+
+        legend.append("rect")
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", (d, i) => color(i));
+
+        legend.append("text")
+            .attr("x", 20)
+            .attr("y", 10)
+            .text(d => d.genre)
+            .style("font-size", "12px")
+            .attr("alignment-baseline", "middle");
+    }
+
+    updateChart(data);
+
+    return {
+        update: updateChart
+    };
+}
+
+// Update existing chart functions to use the new data structure
+function createLineChart(data) {
     const svg = d3.select("#line-chart")
         .append("svg")
         .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
         .append("g")
         .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const x = d3.scaleTime()
-        .range([0, INNER_WIDTH]);
+    const x = d3.scaleTime().range([0, INNER_WIDTH]);
+    const y = d3.scaleLinear().range([INNER_HEIGHT, 0]);
 
-    const y = d3.scaleLinear()
-        .range([INNER_HEIGHT, 0]);
+    function updateChart(filteredData) {
+        const streamsByDate = d3.rollup(filteredData,
+            v => d3.sum(v, d => d.streams),
+            d => d3.timeYear(d.released_date)
+        );
 
-    // Add line
-    const line = d3.line()
-        .x(d => x(d.released_date, 0))
-        .y(d => y(d.streams))
-        .defined(d => d.streams !=null && !isNaN(d.streams));
+        const lineData = Array.from(streamsByDate, ([date, streams]) => ({date, streams}))
+            .sort((a, b) => a.date - b.date);
 
-    //initial scales setup
-    function updateScales(currentData) {
-        x.domain(d3.executedFunction(currentData, d => d.released_date));
-        y.domain([0, d3.max(currentData, d => d.streams)]);
+        x.domain(d3.extent(lineData, d => d.date));
+        y.domain([0, d3.max(lineData, d => d.streams)]);
+
+        svg.selectAll("*").remove();
+
+        svg.append("g")
+            .attr("transform", `translate(0,${INNER_HEIGHT})`)
+            .call(d3.axisBottom(x));
+
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        const line = d3.line()
+            .x(d => x(d.date))
+            .y(d => y(d.streams));
+
+        svg.append("path")
+            .datum(lineData)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 1.5)
+            .attr("d", line);
     }
 
-    updateScales(data);
+    updateChart(data);
 
-    // Add axes
-    const xAxis = svg.append("g")
-        .attr("class", "x-axis")
-        .attr("transform", `translate(0,${INNER_HEIGHT})`);
+    return {
+        update: updateChart
+    };
+}
 
-    const yAxis = svg.append("g")
-        .attr("class", "y-axis");
-
-    // Add line path
-    const path = svg.append("path")
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("stroke", "#22C55E")
-        .attr("stroke-width", 2);
-
-        function updateChart(newData) {
-            if (!newData || !newData.length) {
-                console.warn('No data provided for line chart update');
-                return;
-            }
-
-            // Update scales
-            updateScales(newData);
-
-            // Update axes
-            xAxis.call(d3.axisBottom(x));
-            yAxis.call(d3.axisLeft(y));
-
-            //Update line
-            path.datum(newData)
-                .attr("d", line);
-
-        }
-
-        //initial render
-        updateChart(data);
-
-        return{
-            update: updateChart,
-            currentData: data
-        };
-    }
 function createBarChart(data) {
-
-    // Grouped data by artist
-    const artistData = d3.rollup(data,
-        v => d3.sum(v, d => d.streams),
-        d => d.artist_name
-    );
-
-    const sortedArtists = Array.from(artistData.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-
     const svg = d3.select("#bar-chart")
         .append("svg")
         .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
         .append("g")
         .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const x = d3.scaleBand()
-        .domain(sortedArtists.map(d => d[0]))
-        .range([0, INNER_WIDTH])
-        .padding(0.1);
+    const x = d3.scaleBand().range([0, INNER_WIDTH]).padding(0.1);
+    const y = d3.scaleLinear().range([INNER_HEIGHT, 0]);
 
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(sortedArtists, d => d[1])])
-        .range([INNER_HEIGHT, 0]);
+    function updateChart(filteredData) {
+        const artistStreams = d3.rollup(filteredData,
+            v => d3.sum(v, d => d.streams),
+            d => d.artist_name
+        );
 
-    // Add bars
-    svg.selectAll(".bar")
-        .data(sortedArtists)
-        .enter()
-        .append("rect")
-        .attr("class", "bar")
-        .attr("x", d => x(d[0]))
-        .attr("y", d => y(d[1]))
-        .attr("width", x.bandwidth())
-        .attr("height", d => INNER_HEIGHT - y(d[1]))
-        .attr("fill", "#22C55E");
+        const barData = Array.from(artistStreams, ([artist, streams]) => ({artist, streams}))
+            .sort((a, b) => b.streams - a.streams)
+            .slice(0, 10);
 
-    // Add axes
-    svg.append("g")
-        .attr("transform", `translate(0,${INNER_HEIGHT})`)
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-        .attr("transform", "rotate(-45)")
-        .style("text-anchor", "end");
+        x.domain(barData.map(d => d.artist));
+        y.domain([0, d3.max(barData, d => d.streams)]);
 
-    svg.append("g")
-        .call(d3.axisLeft(y));
+        svg.selectAll("*").remove();
+
+        svg.append("g")
+            .attr("transform", `translate(0,${INNER_HEIGHT})`)
+            .call(d3.axisBottom(x))
+            .selectAll("text")
+            .attr("transform", "rotate(-45)")
+            .style("text-anchor", "end");
+
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        svg.selectAll(".bar")
+            .data(barData)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", d => x(d.artist))
+            .attr("width", x.bandwidth())
+            .attr("y", d => y(d.streams))
+            .attr("height", d => INNER_HEIGHT - y(d.streams))
+            .attr("fill", "#22C55E");
+
+        // Add labels
+        svg.append("text")
+            .attr("transform", `translate(${INNER_WIDTH/2}, ${INNER_HEIGHT + MARGIN.bottom - 5})`)
+            .style("text-anchor", "middle")
+            .text("Artists");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - MARGIN.left)
+            .attr("x", 0 - (INNER_HEIGHT / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Total Streams");
+    }
+
+    updateChart(data);
 
     return {
-        update: function(filteredData) {
-            // implement the update logic
-            const artistData = d3.rollup(filteredData,
-                v => d3.sum(v, d => d.streams),
-                d => d.artist_name
-            );
-
-            const sortedArtists = Array.from(artistData.entries())
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 10);
-
-                // Update scales
-                x.domain(sortedArtists.map(d => d[0]));
-                y.domain([0, d3.max(sortedArtists, d => d[1])]);
-
-                // Update bars
-                const bars = svg.selectAll(".bar")
-                    .data(sortedArtists);
-
-                bars.exit().remove();
-
-                bars.enter()
-                    .append("rect")
-                    .attr("class", "bar")
-                    .merge(bars)
-                    .attr("x", d => x(d[0]))
-                    .attr("y", d => y(d[1]))
-                    .attr("width", x.bandwidth())
-                    .attr("height", d => INNER_HEIGHT - y(d[1]))
-                    .attr("fill", "#22C55E");
-        }
+        update: updateChart
     };
 }
 
 function createPieChart(data) {
-    const width = 300;
-    const height = 300;
-    const radius = Math.min(width, height) / 2;
-
-    const genreData = d3.rollup(data,
-        v => v.length,
-        d => d.genre || 'Unknown'
-    );
-
-    const pieData = Array.from(genreData.entries());
-
     const svg = d3.select("#pie-chart")
         .append("svg")
-        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
         .append("g")
-        .attr("transform", `translate(${width/2},${height/2})`);
+        .attr("transform", `translate(${CHART_WIDTH/2},${CHART_HEIGHT/2})`);
 
+    const radius = Math.min(INNER_WIDTH, INNER_HEIGHT) / 2;
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
-    const pie = d3.pie()
-        .value(d => d[1])
-        .sort(null);
+    function updateChart(filteredData) {
+        const genreCounts = d3.rollup(filteredData,
+            v => v.length,
+            d => d.genre
+        );
 
-    const arc = d3.arc()
-        .innerRadius(radius * 0.3)
-        .outerRadius(radius * 0.8);
+        const pieData = Array.from(genreCounts, ([genre, count]) => ({genre, count}))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);  // Top 5 genres
 
-    const outerArc = d3.arc()
-        .innerRadius(radius * 0.9)
-        .outerRadius(radius * 0.9);
+        const pie = d3.pie()
+            .value(d => d.count)
+            .sort(null);
 
-    // Add the arcs
-    const paths = svg.selectAll('path')
-        .data(pie(pieData))
-        .enter()
-        .append('path')
-        .attr('d', arc)
-        .attr('fill', d => color(d.data[0]))
-        .attr('stroke', 'white')
-        .style('stroke-width', '2px');
+        const arc = d3.arc()
+            .innerRadius(0)
+            .outerRadius(radius);
 
-    // Add labels
-    const labels = svg.selectAll('text')
-        .data(pie(pieData))
-        .enter()
-        .append('text')
-        .attr('transform', d => {
-            const pos = outerArc.centroid(d);
-            return `translate(${pos})`;
-        })
-        .style('text-anchor', 'middle')
-        .text(d => d.data[0]);
+        svg.selectAll("*").remove();
+
+        const arcs = svg.selectAll("arc")
+            .data(pie(pieData))
+            .enter()
+            .append("g")
+            .attr("class", "arc");
+
+        arcs.append("path")
+            .attr("d", arc)
+            .attr("fill", (d, i) => color(i));
+
+        // Add labels
+        arcs.append("text")
+            .attr("transform", d => `translate(${arc.centroid(d)})`)
+            .attr("text-anchor", "middle")
+            .text(d => d.data.genre)
+            .style("font-size", "12px")
+            .style("fill", "white");
+
+        // Add legend
+        const legend = svg.selectAll(".legend")
+            .data(pieData)
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", (d, i) => `translate(${radius + 20}, ${-radius + 20 + i * 20})`);
+
+        legend.append("rect")
+            .attr("width", 10)
+            .attr("height", 10)
+            .attr("fill", (d, i) => color(i));
+
+        legend.append("text")
+            .attr("x", 20)
+            .attr("y", 9)
+            .text(d => `${d.genre} (${d.count})`)
+            .style("font-size", "12px");
+    }
+
+    updateChart(data);
 
     return {
-        update: function(filteredData) {
-            // implement the update logic
-            const updateGenreData = d3.rollup(filteredData,
-                v => v.length,
-                d => d.genre || 'Unknown'
-            );
-
-            const updatePieData = Array.from(updateGenreData.entries());
-
-            //update paths
-            paths.data(pie(updatePieData))
-                .transition()
-                .duration(750)
-                .attr('d', arc);
-
-            //update labels
-            labels.data(pie(updatePieData))
-                .transition()
-                .duration(750)
-                .attr('transform', d => {
-                    const pos = outerArc.centroid(d);
-                    return `translate(${pos})`;
-                })
-                .text(d => d.data[0]);
-        }
+        update: updateChart
     };
 }
 
@@ -429,245 +717,131 @@ function createScatterPlot(data) {
         .append("g")
         .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const x = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.length)])
-        .range([0, INNER_WIDTH]);
+    const x = d3.scaleLinear().range([0, INNER_WIDTH]);
+    const y = d3.scaleLinear().range([INNER_HEIGHT, 0]);
 
-    const y = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.streams)])
-        .range([INNER_HEIGHT, 0]);
+    function updateChart(filteredData) {
+        x.domain([0, d3.max(filteredData, d => d.duration_ms / 60000)]);  // Convert to minutes
+        y.domain([0, d3.max(filteredData, d => d.streams)]);
 
-    // Add dots
-    svg.selectAll(".dot")
-        .data(data)
-        .enter()
-        .append("circle")
-        .attr("class", "dot")
-        .attr("cx", d => x(d.length))
-        .attr("cy", d => y(d.streams))
-        .attr("r", 4)
-        .style("fill", "#22C55E")
-        .style("opacity", 0.6);
+        svg.selectAll("*").remove();
 
-    // Add axes
-    svg.append("g")
-        .attr("transform", `translate(0,${INNER_HEIGHT})`)
-        .call(d3.axisBottom(x));
+        svg.append("g")
+            .attr("transform", `translate(0,${INNER_HEIGHT})`)
+            .call(d3.axisBottom(x));
 
-    svg.append("g")
-        .call(d3.axisLeft(y));
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        svg.selectAll(".dot")
+            .data(filteredData)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => x(d.duration_ms / 60000))
+            .attr("cy", d => y(d.streams))
+            .attr("r", 3)
+            .style("fill", "#22C55E")
+            .style("opacity", 0.7);
+
+        // Add labels
+        svg.append("text")
+            .attr("transform", `translate(${INNER_WIDTH/2}, ${INNER_HEIGHT + MARGIN.bottom - 5})`)
+            .style("text-anchor", "middle")
+            .text("Song Duration (minutes)");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - MARGIN.left)
+            .attr("x", 0 - (INNER_HEIGHT / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Total Streams");
+    }
+
+    updateChart(data);
 
     return {
-        update: function(filteredData) {
-            // update scales
-            x.domain([0, d3.max(filteredData, d => d.length)]);
-            y.domain([0, d3.max(filteredData, d => d.streams)]);
-
-            // update dots
-            const dots = svg.selectAll(".dot")
-                .data(filteredData);
-
-            dots.exit().remove();
-
-            dots.enter()
-                .append("circle")
-                .attr("class", "dot")
-                .merge(dots)
-                .transition()
-                .duration(750)
-                .attr("cx", d => x(d.length))
-                .attr("cy", d => y(d.streams))
-                .attr("r", 4)
-                .style("fill", "#22C55E")
-                .style("opacity", 0.6);
-        }
+        update: updateChart
     };
 }
 
 function createHeatmap(data) {
-    // Group data by month and genre
-    const months = d3.range(12);
-    const genres = Array.from(new Set(data.map(d => d.genre)));
-
-    // Create heatmap data structure
-    const heatmapData = [];
-    genres.forEach(genre => {
-        months.forEach(month => {
-            const streams = data
-                .filter(d => d.genre === genre && new Date(d.released_date).getMonth() === month)
-                .reduce((sum, d) => sum + d.streams, 0);
-            heatmapData.push({
-                genre,
-                month,
-                streams
-            });
-        });
-    });
-
     const svg = d3.select("#heatmap")
         .append("svg")
         .attr("viewBox", `0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`)
         .append("g")
         .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    const x = d3.scaleBand()
-        .domain(months)
-        .range([0, INNER_WIDTH])
-        .padding(0.1);
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const x = d3.scaleBand().range([0, INNER_WIDTH]).padding(0.05);
+    const y = d3.scaleBand().range([INNER_HEIGHT, 0]).padding(0.05);
+    const color = d3.scaleSequential(d3.interpolateGreens);
 
-    const y = d3.scaleBand()
-        .domain(genres)
-        .range([0, INNER_HEIGHT])
-        .padding(0.1);
+    function updateChart(filteredData) {
+        const heatmapData = d3.rollup(filteredData,
+            v => d3.sum(v, d => d.streams),
+            d => d.genre,
+            d => d.released_date.getMonth()
+        );
 
-    const color = d3.scaleSequential()
-        .domain([0, d3.max(heatmapData, d => d.streams)])
-        .interpolator(d3.interpolateGreens);
+        const genres = Array.from(heatmapData.keys());
+        x.domain(months);
+        y.domain(genres);
 
-    // Add cells
-    svg.selectAll("rect")
-        .data(heatmapData)
-        .enter()
-        .append("rect")
-        .attr("x", d => x(d.month))
-        .attr("y", d => y(d.genre))
-        .attr("width", x.bandwidth())
-        .attr("height", y.bandwidth())
-        .style("fill", d => color(d.streams));
+        const allValues = Array.from(heatmapData.values(), m => Array.from(m.values())).flat();
+        color.domain([0, d3.max(allValues)]);
 
-    // Add axes
-    svg.append("g")
-        .attr("transform", `translate(0,${INNER_HEIGHT})`)
-        .call(d3.axisBottom(x)
-            .tickFormat(m => d3.timeFormat("%b")(new Date(2024, m))));
+        svg.selectAll("*").remove();
 
-    svg.append("g")
-        .call(d3.axisLeft(y));
+        // Add X axis
+        svg.append("g")
+            .attr("transform", `translate(0,${INNER_HEIGHT})`)
+            .call(d3.axisBottom(x));
+
+        // Add Y axis
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // Create the heatmap cells
+        genres.forEach(genre => {
+            const genreData = heatmapData.get(genre);
+            svg.selectAll(`.cell-${genre}`)
+                .data(months)
+                .enter().append("rect")
+                .attr("class", `cell-${genre}`)
+                .attr("x", d => x(d))
+                .attr("y", y(genre))
+                .attr("width", x.bandwidth())
+                .attr("height", y.bandwidth())
+                .style("fill", d => {
+                    const monthIndex = months.indexOf(d);
+                    return color(genreData.get(monthIndex) || 0);
+                });
+        });
+
+        // Add labels
+        svg.append("text")
+            .attr("transform", `translate(${INNER_WIDTH/2}, ${INNER_HEIGHT + MARGIN.bottom - 5})`)
+            .style("text-anchor", "middle")
+            .text("Month");
+
+        svg.append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 0 - MARGIN.left)
+            .attr("x", 0 - (INNER_HEIGHT / 2))
+            .attr("dy", "1em")
+            .style("text-anchor", "middle")
+            .text("Genre");
+    }
+
+    updateChart(data);
 
     return {
-        update: function(filteredData) {
-            // implement update logic
-            const updatedHeatmapData = [];
-            genres.forEach(genre => {
-                months.forEach(month => {
-                    const streams = filteredData
-                        .filter(d => d.genre === genre && new Date(d.released_date).getMonth() === month)
-                        .reduce((sum, d) => sum + d.streams, 0);
-                    updatedHeatmapData.push({
-                        genre,
-                        month,
-                        streams
-                    });
-                });
-            });
-
-            //update color scale
-            color.domain([0, d3.max(updatedHeatmapData, d => d.streams)]);
-
-            // update cells
-            svg.selectAll("rect")
-                .data(updatedHeatmapData)
-                .transition()
-                .duration(750)
-                .style("fill", d => color(d.streams));
-            }
-        }
+        update: updateChart
     };
-
-
-function setupFilters(data, charts) {
-    // Ensure we have valid data
-    if (!data || !data.length) {
-        console.error('No valid data provided for filters');
-        return;
-    }
-    // Genre filter
-    const genreSelect = document.getElementById('genre');
-    if (genreSelect) {
-        const genres = ['All Genres', ...new Set(data.map(d => d.genre).filter(Boolean))].sort();
-        genreSelect.innerHTML = genres.map(genre =>
-            `<option value="${genre}">${genre}</option>`
-        ).join('');
-    }
-
-    // Artist filter
-    const artistSelect = document.getElementById('artist');
-    if (artistSelect) {
-        const artists = ['All Artists', ...new Set(data.map(d => d.artist_name).filter(Boolean))].sort();
-        artistSelect.innerHTML = artists.map(artist =>
-            `<option value="${artist}">${artist}</option>`
-        ).join('');
-    }
-
-    // Date range inputs
-    const startDate = document.getElementById('start-date');
-    const endDate = document.getElementById('end-date');
-
-    if (startDate && endDate) {
-        const validDates = data
-            .map(d => d.released_date)
-            .filter(d => d instanceof Date && !isNaN(d.getTime()))
-            .sort((a, b) => a - b);
-
-        if (validDates.length) {
-            startDate.value = formatDate(validDates[0]);
-            endDate.value = formatDate(validDates[validDates.length - 1]);
-        }
-    }
-
-    // Filter change handler
-    function handleFilterChange() {
-        const selectedGenre = genreSelect ? genreSelect.value : 'All Genres';
-        const selectedArtist = artistSelect ? artistSelect.value : 'All Artists';
-        const startDateVal = startDate ? parseDate(startDate.value) : null;
-        const endDateVal = endDate ? parseDate(endDate.value) : null;
-
-        const filteredData = data.filter(d => {
-            const genreMatch = selectedGenre === 'All Genres' || d.genre === selectedGenre;
-            const artistMatch = selectedArtist === 'All Artists' || d.artist_name === selectedArtist;
-            const dateMatch = (!startDateVal || d.released_date >= startDateVal) &&
-                            (!endDateVal || d.released_date <= endDateVal);
-            return genreMatch && artistMatch && dateMatch;
-        });
-
-        // Update all charts
-        Object.entries(charts).forEach(([key, chart]) => {
-            if (chart && typeof chart.update === 'function') {
-                chart.currentData = filteredData;
-                chart.update(filteredData);
-            }
-        });
-    }
-
-
-
-    // Add event listeners
-    if (genreSelect) genreSelect.addEventListener('change', handleFilterChange);
-    if (artistSelect) artistSelect.addEventListener('change', handleFilterChange);
-    if (startDate) startDate.addEventListener('change', handleFilterChange);
-    if (endDate) endDate.addEventListener('change', handleFilterChange);
-
-    // Reset filters button
-    const resetButton = document.getElementById('reset-filters');
-    if (resetButton) {
-        resetButton.addEventListener('click', () => {
-            if (genreSelect) genreSelect.value = 'All Genres';
-            if (artistSelect) artistSelect.value = 'All Artists';
-            if (startDate && endDate) {
-                const validDates = data
-                    .map(d => d.released_date)
-                    .filter(d => d instanceof Date && !isNaN(d.getTime()))
-                    .sort((a, b) => a - b);
-
-                if (validDates.length) {
-                    startDate.value = formatDate(validDates[0]);
-                    endDate.value = formatDate(validDates[validDates.length - 1]);
-                }
-            }
-            handleFilterChange();
-        });
-    }
-
-    // Initial filter application
-    handleFilterChange();
 }
+
+// Initialize the dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+});

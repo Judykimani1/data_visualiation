@@ -33821,16 +33821,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
 function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) { return typeof o; } : function (o) { return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o; }, _typeof(o); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return e; }; var t, e = {}, r = Object.prototype, n = r.hasOwnProperty, o = Object.defineProperty || function (t, e, r) { t[e] = r.value; }, i = "function" == typeof Symbol ? Symbol : {}, a = i.iterator || "@@iterator", c = i.asyncIterator || "@@asyncIterator", u = i.toStringTag || "@@toStringTag"; function define(t, e, r) { return Object.defineProperty(t, e, { value: r, enumerable: !0, configurable: !0, writable: !0 }), t[e]; } try { define({}, ""); } catch (t) { define = function define(t, e, r) { return t[e] = r; }; } function wrap(t, e, r, n) { var i = e && e.prototype instanceof Generator ? e : Generator, a = Object.create(i.prototype), c = new Context(n || []); return o(a, "_invoke", { value: makeInvokeMethod(t, r, c) }), a; } function tryCatch(t, e, r) { try { return { type: "normal", arg: t.call(e, r) }; } catch (t) { return { type: "throw", arg: t }; } } e.wrap = wrap; var h = "suspendedStart", l = "suspendedYield", f = "executing", s = "completed", y = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var p = {}; define(p, a, function () { return this; }); var d = Object.getPrototypeOf, v = d && d(d(values([]))); v && v !== r && n.call(v, a) && (p = v); var g = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(p); function defineIteratorMethods(t) { ["next", "throw", "return"].forEach(function (e) { define(t, e, function (t) { return this._invoke(e, t); }); }); } function AsyncIterator(t, e) { function invoke(r, o, i, a) { var c = tryCatch(t[r], t, o); if ("throw" !== c.type) { var u = c.arg, h = u.value; return h && "object" == _typeof(h) && n.call(h, "__await") ? e.resolve(h.__await).then(function (t) { invoke("next", t, i, a); }, function (t) { invoke("throw", t, i, a); }) : e.resolve(h).then(function (t) { u.value = t, i(u); }, function (t) { return invoke("throw", t, i, a); }); } a(c.arg); } var r; o(this, "_invoke", { value: function value(t, n) { function callInvokeWithMethodAndArg() { return new e(function (e, r) { invoke(t, n, e, r); }); } return r = r ? r.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(e, r, n) { var o = h; return function (i, a) { if (o === f) throw Error("Generator is already running"); if (o === s) { if ("throw" === i) throw a; return { value: t, done: !0 }; } for (n.method = i, n.arg = a;;) { var c = n.delegate; if (c) { var u = maybeInvokeDelegate(c, n); if (u) { if (u === y) continue; return u; } } if ("next" === n.method) n.sent = n._sent = n.arg;else if ("throw" === n.method) { if (o === h) throw o = s, n.arg; n.dispatchException(n.arg); } else "return" === n.method && n.abrupt("return", n.arg); o = f; var p = tryCatch(e, r, n); if ("normal" === p.type) { if (o = n.done ? s : l, p.arg === y) continue; return { value: p.arg, done: n.done }; } "throw" === p.type && (o = s, n.method = "throw", n.arg = p.arg); } }; } function maybeInvokeDelegate(e, r) { var n = r.method, o = e.iterator[n]; if (o === t) return r.delegate = null, "throw" === n && e.iterator["return"] && (r.method = "return", r.arg = t, maybeInvokeDelegate(e, r), "throw" === r.method) || "return" !== n && (r.method = "throw", r.arg = new TypeError("The iterator does not provide a '" + n + "' method")), y; var i = tryCatch(o, e.iterator, r.arg); if ("throw" === i.type) return r.method = "throw", r.arg = i.arg, r.delegate = null, y; var a = i.arg; return a ? a.done ? (r[e.resultName] = a.value, r.next = e.nextLoc, "return" !== r.method && (r.method = "next", r.arg = t), r.delegate = null, y) : a : (r.method = "throw", r.arg = new TypeError("iterator result is not an object"), r.delegate = null, y); } function pushTryEntry(t) { var e = { tryLoc: t[0] }; 1 in t && (e.catchLoc = t[1]), 2 in t && (e.finallyLoc = t[2], e.afterLoc = t[3]), this.tryEntries.push(e); } function resetTryEntry(t) { var e = t.completion || {}; e.type = "normal", delete e.arg, t.completion = e; } function Context(t) { this.tryEntries = [{ tryLoc: "root" }], t.forEach(pushTryEntry, this), this.reset(!0); } function values(e) { if (e || "" === e) { var r = e[a]; if (r) return r.call(e); if ("function" == typeof e.next) return e; if (!isNaN(e.length)) { var o = -1, i = function next() { for (; ++o < e.length;) if (n.call(e, o)) return next.value = e[o], next.done = !1, next; return next.value = t, next.done = !0, next; }; return i.next = i; } } throw new TypeError(_typeof(e) + " is not iterable"); } return GeneratorFunction.prototype = GeneratorFunctionPrototype, o(g, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), o(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, u, "GeneratorFunction"), e.isGeneratorFunction = function (t) { var e = "function" == typeof t && t.constructor; return !!e && (e === GeneratorFunction || "GeneratorFunction" === (e.displayName || e.name)); }, e.mark = function (t) { return Object.setPrototypeOf ? Object.setPrototypeOf(t, GeneratorFunctionPrototype) : (t.__proto__ = GeneratorFunctionPrototype, define(t, u, "GeneratorFunction")), t.prototype = Object.create(g), t; }, e.awrap = function (t) { return { __await: t }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, c, function () { return this; }), e.AsyncIterator = AsyncIterator, e.async = function (t, r, n, o, i) { void 0 === i && (i = Promise); var a = new AsyncIterator(wrap(t, r, n, o), i); return e.isGeneratorFunction(r) ? a : a.next().then(function (t) { return t.done ? t.value : a.next(); }); }, defineIteratorMethods(g), define(g, u, "Generator"), define(g, a, function () { return this; }), define(g, "toString", function () { return "[object Generator]"; }), e.keys = function (t) { var e = Object(t), r = []; for (var n in e) r.push(n); return r.reverse(), function next() { for (; r.length;) { var t = r.pop(); if (t in e) return next.value = t, next.done = !1, next; } return next.done = !0, next; }; }, e.values = values, Context.prototype = { constructor: Context, reset: function reset(e) { if (this.prev = 0, this.next = 0, this.sent = this._sent = t, this.done = !1, this.delegate = null, this.method = "next", this.arg = t, this.tryEntries.forEach(resetTryEntry), !e) for (var r in this) "t" === r.charAt(0) && n.call(this, r) && !isNaN(+r.slice(1)) && (this[r] = t); }, stop: function stop() { this.done = !0; var t = this.tryEntries[0].completion; if ("throw" === t.type) throw t.arg; return this.rval; }, dispatchException: function dispatchException(e) { if (this.done) throw e; var r = this; function handle(n, o) { return a.type = "throw", a.arg = e, r.next = n, o && (r.method = "next", r.arg = t), !!o; } for (var o = this.tryEntries.length - 1; o >= 0; --o) { var i = this.tryEntries[o], a = i.completion; if ("root" === i.tryLoc) return handle("end"); if (i.tryLoc <= this.prev) { var c = n.call(i, "catchLoc"), u = n.call(i, "finallyLoc"); if (c && u) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } else if (c) { if (this.prev < i.catchLoc) return handle(i.catchLoc, !0); } else { if (!u) throw Error("try statement without catch or finally"); if (this.prev < i.finallyLoc) return handle(i.finallyLoc); } } } }, abrupt: function abrupt(t, e) { for (var r = this.tryEntries.length - 1; r >= 0; --r) { var o = this.tryEntries[r]; if (o.tryLoc <= this.prev && n.call(o, "finallyLoc") && this.prev < o.finallyLoc) { var i = o; break; } } i && ("break" === t || "continue" === t) && i.tryLoc <= e && e <= i.finallyLoc && (i = null); var a = i ? i.completion : {}; return a.type = t, a.arg = e, i ? (this.method = "next", this.next = i.finallyLoc, y) : this.complete(a); }, complete: function complete(t, e) { if ("throw" === t.type) throw t.arg; return "break" === t.type || "continue" === t.type ? this.next = t.arg : "return" === t.type ? (this.rval = this.arg = t.arg, this.method = "return", this.next = "end") : "normal" === t.type && e && (this.next = e), y; }, finish: function finish(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.finallyLoc === t) return this.complete(r.completion, r.afterLoc), resetTryEntry(r), y; } }, "catch": function _catch(t) { for (var e = this.tryEntries.length - 1; e >= 0; --e) { var r = this.tryEntries[e]; if (r.tryLoc === t) { var n = r.completion; if ("throw" === n.type) { var o = n.arg; resetTryEntry(r); } return o; } } throw Error("illegal catch attempt"); }, delegateYield: function delegateYield(e, r, n) { return this.delegate = { iterator: values(e), resultName: r, nextLoc: n }, "next" === this.method && (this.arg = t), y; } }, e; }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == _typeof(i) ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
+function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
+function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 
@@ -33846,19 +33851,12 @@ var CHART_WIDTH = 600;
 var CHART_HEIGHT = 400;
 var INNER_WIDTH = CHART_WIDTH - MARGIN.left - MARGIN.right;
 var INNER_HEIGHT = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
+
 // Utility functions
+var formatDate = d3__WEBPACK_IMPORTED_MODULE_0__.timeFormat("%Y-%m-%d");
+var parseDate = d3__WEBPACK_IMPORTED_MODULE_0__.timeParse("%Y-%m-%d");
 
-var formatDate = function formatDate(date) {
-  if (!date || !(date instanceof Date) || isNaN(date.getTime())) return '';
-  return date.toISOString().split('T')[0];
-};
-var parseDate = function parseDate(dateString) {
-  if (!dateString) return null;
-  var date = new Date(dateString);
-  return isNaN(date.getTime()) ? null : date;
-};
-
-// Loading state handling functions - Define these BEFORE they're used
+// Loading state handling functions
 function showLoading() {
   document.querySelectorAll('.chart-container').forEach(function (container) {
     container.innerHTML = "\n            <div class=\"flex items-center justify-center h-full\">\n                <div class=\"animate-spin rounded-full h-8 w-8 border-b-2 border-green-500\"></div>\n            </div>\n        ";
@@ -33873,84 +33871,53 @@ function hideLoading() {
   });
 }
 
-// Sample dataset structure
-var SAMPLE_DATA = [{
-  "track_name": "Shape of You",
-  "artist_name": "Ed Sheeran",
-  "released_date": "2017-01-06",
-  "streams": 3270283771,
-  "duration_ms": 233713,
-  "genre": "pop"
-}, {
-  "track_name": "Blinding Lights",
-  "artist_name": "The Weeknd",
-  "released_date": "2019-11-29",
-  "streams": 3024354847,
-  "duration_ms": 200040,
-  "genre": "pop"
-}];
-
 // Error handling wrapper for data loading
 function loadData() {
   return _loadData.apply(this, arguments);
 } // Utility function for debouncing resize events
 function _loadData() {
   _loadData = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var data;
+    var response, csvData, data;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           _context.prev = 0;
           _context.next = 3;
-          return d3__WEBPACK_IMPORTED_MODULE_0__.csv("./data/smss.csv")["catch"](function () {
-            return null;
-          });
+          return fetch("./data/smss.csv");
         case 3:
-          data = _context.sent;
-          if (data) {
-            _context.next = 9;
-            break;
-          }
-          console.log("Local CSV not found, trying GitHub source...");
-          _context.next = 8;
-          return d3__WEBPACK_IMPORTED_MODULE_0__.csv("https://raw.githubusercontent.com/Judykimani1/data_visualization/refs/heads/master/data/smss.csv");
-        case 8:
-          data = _context.sent;
-        case 9:
-          // If both fail, use sample data
-          if (!data || data.length === 0) {
-            console.log("Using sample data as fallback");
-            data = SAMPLE_DATA;
-          }
-
-          // Process data
-          return _context.abrupt("return", data.map(function (d) {
-            var released_date = parseDate(d.released_date);
-            if (!released_date) {
-              console.warn("Invalid date found: ".concat(d.released_date));
-            }
+          response = _context.sent;
+          _context.next = 6;
+          return response.text();
+        case 6:
+          csvData = _context.sent;
+          data = d3__WEBPACK_IMPORTED_MODULE_0__.csvParse(csvData, function (d) {
             return {
-              track_name: d.track_name || 'Unknown Track',
-              artist_name: d.artist_name || 'Unknown Artist',
-              released_date: released_date || new Date(),
-              streams: parseInt(d.streams) || 0,
-              duration_ms: parseInt(d.duration_ms) || 0,
+              track_name: d.track_name,
+              artist_name: d['artist(s)_name'],
+              released_date: parseDate(d.released_year + '-' + d.released_month + '-' + d.released_day),
+              streams: +d.streams,
+              duration_ms: +d.duration_ms,
               genre: d.genre || 'Unknown',
-              duration_min: (parseInt(d.duration_ms || 0) / 60000).toFixed(2)
+              danceability: +d['danceability_%'],
+              valence: +d['valence_%'],
+              energy: +d['energy_%'],
+              acousticness: +d['acousticness_%'],
+              instrumentalness: +d['instrumentalness_%'],
+              liveness: +d['liveness_%'],
+              speechiness: +d['speechiness_%']
             };
-          }).filter(function (d) {
-            return d.released_date instanceof Date && !isNaN(d.released_date.getDate());
-          }));
-        case 13:
-          _context.prev = 13;
+          });
+          return _context.abrupt("return", data);
+        case 11:
+          _context.prev = 11;
           _context.t0 = _context["catch"](0);
           console.error("Error loading data:", _context.t0);
           return _context.abrupt("return", []);
-        case 17:
+        case 15:
         case "end":
           return _context.stop();
       }
-    }, _callee, null, [[0, 13]]);
+    }, _callee, null, [[0, 11]]);
   }));
   return _loadData.apply(this, arguments);
 }
@@ -33979,14 +33946,10 @@ function makeChartsResponsive(charts) {
         svg.setAttribute('viewBox', "0 0 ".concat(width, " ").concat(height));
         svg.setAttribute('width', width);
         svg.setAttribute('height', height);
-      }
-    });
-    Object.entries(charts).forEach(function (_ref) {
-      var _ref2 = _slicedToArray(_ref, 2),
-        key = _ref2[0],
-        chart = _ref2[1];
-      if (chart && typeof chart.update === 'function' && chart.currentData) {
-        chart.update(chart.currentData);
+        var chartId = container.id;
+        if (charts[chartId] && typeof charts[chartId].resize === 'function') {
+          charts[chartId].resize(width, height);
+        }
       }
     });
   }
@@ -34010,7 +33973,7 @@ function _initDashboard() {
           return loadData();
         case 4:
           data = _context2.sent;
-          if (data) {
+          if (!(!data || data.length === 0)) {
             _context2.next = 7;
             break;
           }
@@ -34022,7 +33985,10 @@ function _initDashboard() {
             barChart: createBarChart(data),
             pieChart: createPieChart(data),
             scatterPlot: createScatterPlot(data),
-            heatmap: createHeatmap(data)
+            heatmap: createHeatmap(data),
+            bubbleChart: createBubbleChart(data),
+            spiderChart: createSpiderChart(data),
+            radarChart: createRadarChart(data)
           }; // Set up filter listeners
           setupFilters(data, charts);
 
@@ -34050,405 +34016,529 @@ function _initDashboard() {
 document.addEventListener('DOMContentLoaded', function () {
   initDashboard();
 });
-function createLineChart(data) {
-  if (!data || !data.length) {
-    console.warn('No data provided for line chart');
-    return {
-      update: function update() {}
-    };
-  }
-  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#line-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
-  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleTime().range([0, INNER_WIDTH]);
-  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([INNER_HEIGHT, 0]);
 
-  // Add line
-  var line = d3__WEBPACK_IMPORTED_MODULE_0__.line().x(function (d) {
-    return x(d.released_date, 0);
-  }).y(function (d) {
-    return y(d.streams);
-  }).defined(function (d) {
-    return d.streams != null && !isNaN(d.streams);
-  });
-
-  //initial scales setup
-  function updateScales(currentData) {
-    x.domain(d3__WEBPACK_IMPORTED_MODULE_0__.executedFunction(currentData, function (d) {
-      return d.released_date;
-    }));
-    y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(currentData, function (d) {
-      return d.streams;
-    })]);
-  }
-  updateScales(data);
-
-  // Add axes
-  var xAxis = svg.append("g").attr("class", "x-axis").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")"));
-  var yAxis = svg.append("g").attr("class", "y-axis");
-
-  // Add line path
-  var path = svg.append("path").attr("class", "line").attr("fill", "none").attr("stroke", "#22C55E").attr("stroke-width", 2);
-  function updateChart(newData) {
-    if (!newData || !newData.length) {
-      console.warn('No data provided for line chart update');
-      return;
-    }
-
-    // Update scales
-    updateScales(newData);
-
-    // Update axes
-    xAxis.call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x));
-    yAxis.call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
-
-    //Update line
-    path.datum(newData).attr("d", line);
-  }
-
-  //initial render
-  updateChart(data);
-  return {
-    update: updateChart,
-    currentData: data
-  };
-}
-function createBarChart(data) {
-  // Grouped data by artist
-  var artistData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(data, function (v) {
-    return d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
-      return d.streams;
-    });
-  }, function (d) {
-    return d.artist_name;
-  });
-  var sortedArtists = Array.from(artistData.entries()).sort(function (a, b) {
-    return b[1] - a[1];
-  }).slice(0, 10);
-  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#bar-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
-  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().domain(sortedArtists.map(function (d) {
-    return d[0];
-  })).range([0, INNER_WIDTH]).padding(0.1);
-  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(sortedArtists, function (d) {
-    return d[1];
-  })]).range([INNER_HEIGHT, 0]);
-
-  // Add bars
-  svg.selectAll(".bar").data(sortedArtists).enter().append("rect").attr("class", "bar").attr("x", function (d) {
-    return x(d[0]);
-  }).attr("y", function (d) {
-    return y(d[1]);
-  }).attr("width", x.bandwidth()).attr("height", function (d) {
-    return INNER_HEIGHT - y(d[1]);
-  }).attr("fill", "#22C55E");
-
-  // Add axes
-  svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
-  svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
-  return {
-    update: function update(filteredData) {
-      // implement the update logic
-      var artistData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
-        return d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
-          return d.streams;
-        });
-      }, function (d) {
-        return d.artist_name;
-      });
-      var sortedArtists = Array.from(artistData.entries()).sort(function (a, b) {
-        return b[1] - a[1];
-      }).slice(0, 10);
-
-      // Update scales
-      x.domain(sortedArtists.map(function (d) {
-        return d[0];
-      }));
-      y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(sortedArtists, function (d) {
-        return d[1];
-      })]);
-
-      // Update bars
-      var bars = svg.selectAll(".bar").data(sortedArtists);
-      bars.exit().remove();
-      bars.enter().append("rect").attr("class", "bar").merge(bars).attr("x", function (d) {
-        return x(d[0]);
-      }).attr("y", function (d) {
-        return y(d[1]);
-      }).attr("width", x.bandwidth()).attr("height", function (d) {
-        return INNER_HEIGHT - y(d[1]);
-      }).attr("fill", "#22C55E");
-    }
-  };
-}
-function createPieChart(data) {
-  var width = 300;
-  var height = 300;
-  var radius = Math.min(width, height) / 2;
-  var genreData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(data, function (v) {
-    return v.length;
-  }, function (d) {
-    return d.genre || 'Unknown';
-  });
-  var pieData = Array.from(genreData.entries());
-  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#pie-chart").append("svg").attr("viewBox", "0 0 ".concat(width, " ").concat(height)).append("g").attr("transform", "translate(".concat(width / 2, ",").concat(height / 2, ")"));
-  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleOrdinal(d3__WEBPACK_IMPORTED_MODULE_0__.schemeCategory10);
-  var pie = d3__WEBPACK_IMPORTED_MODULE_0__.pie().value(function (d) {
-    return d[1];
-  }).sort(null);
-  var arc = d3__WEBPACK_IMPORTED_MODULE_0__.arc().innerRadius(radius * 0.3).outerRadius(radius * 0.8);
-  var outerArc = d3__WEBPACK_IMPORTED_MODULE_0__.arc().innerRadius(radius * 0.9).outerRadius(radius * 0.9);
-
-  // Add the arcs
-  var paths = svg.selectAll('path').data(pie(pieData)).enter().append('path').attr('d', arc).attr('fill', function (d) {
-    return color(d.data[0]);
-  }).attr('stroke', 'white').style('stroke-width', '2px');
-
-  // Add labels
-  var labels = svg.selectAll('text').data(pie(pieData)).enter().append('text').attr('transform', function (d) {
-    var pos = outerArc.centroid(d);
-    return "translate(".concat(pos, ")");
-  }).style('text-anchor', 'middle').text(function (d) {
-    return d.data[0];
-  });
-  return {
-    update: function update(filteredData) {
-      // implement the update logic
-      var updateGenreData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
-        return v.length;
-      }, function (d) {
-        return d.genre || 'Unknown';
-      });
-      var updatePieData = Array.from(updateGenreData.entries());
-
-      //update paths
-      paths.data(pie(updatePieData)).transition().duration(750).attr('d', arc);
-
-      //update labels
-      labels.data(pie(updatePieData)).transition().duration(750).attr('transform', function (d) {
-        var pos = outerArc.centroid(d);
-        return "translate(".concat(pos, ")");
-      }).text(function (d) {
-        return d.data[0];
-      });
-    }
-  };
-}
-function createScatterPlot(data) {
-  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#scatter-plot").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
-  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(data, function (d) {
-    return d.length;
-  })]).range([0, INNER_WIDTH]);
-  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(data, function (d) {
-    return d.streams;
-  })]).range([INNER_HEIGHT, 0]);
-
-  // Add dots
-  svg.selectAll(".dot").data(data).enter().append("circle").attr("class", "dot").attr("cx", function (d) {
-    return x(d.length);
-  }).attr("cy", function (d) {
-    return y(d.streams);
-  }).attr("r", 4).style("fill", "#22C55E").style("opacity", 0.6);
-
-  // Add axes
-  svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x));
-  svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
-  return {
-    update: function update(filteredData) {
-      // update scales
-      x.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(filteredData, function (d) {
-        return d.length;
-      })]);
-      y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(filteredData, function (d) {
-        return d.streams;
-      })]);
-
-      // update dots
-      var dots = svg.selectAll(".dot").data(filteredData);
-      dots.exit().remove();
-      dots.enter().append("circle").attr("class", "dot").merge(dots).transition().duration(750).attr("cx", function (d) {
-        return x(d.length);
-      }).attr("cy", function (d) {
-        return y(d.streams);
-      }).attr("r", 4).style("fill", "#22C55E").style("opacity", 0.6);
-    }
-  };
-}
-function createHeatmap(data) {
-  // Group data by month and genre
-  var months = d3__WEBPACK_IMPORTED_MODULE_0__.range(12);
-  var genres = Array.from(new Set(data.map(function (d) {
-    return d.genre;
-  })));
-
-  // Create heatmap data structure
-  var heatmapData = [];
-  genres.forEach(function (genre) {
-    months.forEach(function (month) {
-      var streams = data.filter(function (d) {
-        return d.genre === genre && new Date(d.released_date).getMonth() === month;
-      }).reduce(function (sum, d) {
-        return sum + d.streams;
-      }, 0);
-      heatmapData.push({
-        genre: genre,
-        month: month,
-        streams: streams
-      });
-    });
-  });
-  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#heatmap").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
-  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().domain(months).range([0, INNER_WIDTH]).padding(0.1);
-  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().domain(genres).range([0, INNER_HEIGHT]).padding(0.1);
-  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleSequential().domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(heatmapData, function (d) {
-    return d.streams;
-  })]).interpolator(d3__WEBPACK_IMPORTED_MODULE_0__.interpolateGreens);
-
-  // Add cells
-  svg.selectAll("rect").data(heatmapData).enter().append("rect").attr("x", function (d) {
-    return x(d.month);
-  }).attr("y", function (d) {
-    return y(d.genre);
-  }).attr("width", x.bandwidth()).attr("height", y.bandwidth()).style("fill", function (d) {
-    return color(d.streams);
-  });
-
-  // Add axes
-  svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x).tickFormat(function (m) {
-    return d3__WEBPACK_IMPORTED_MODULE_0__.timeFormat("%b")(new Date(2024, m));
-  }));
-  svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
-  return {
-    update: function update(filteredData) {
-      // implement update logic
-      var updatedHeatmapData = [];
-      genres.forEach(function (genre) {
-        months.forEach(function (month) {
-          var streams = filteredData.filter(function (d) {
-            return d.genre === genre && new Date(d.released_date).getMonth() === month;
-          }).reduce(function (sum, d) {
-            return sum + d.streams;
-          }, 0);
-          updatedHeatmapData.push({
-            genre: genre,
-            month: month,
-            streams: streams
-          });
-        });
-      });
-
-      //update color scale
-      color.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(updatedHeatmapData, function (d) {
-        return d.streams;
-      })]);
-
-      // update cells
-      svg.selectAll("rect").data(updatedHeatmapData).transition().duration(750).style("fill", function (d) {
-        return color(d.streams);
-      });
-    }
-  };
-}
-;
+// Filter setup function
 function setupFilters(data, charts) {
-  // Ensure we have valid data
-  if (!data || !data.length) {
-    console.error('No valid data provided for filters');
-    return;
-  }
-  // Genre filter
   var genreSelect = document.getElementById('genre');
-  if (genreSelect) {
-    var genres = ['All Genres'].concat(_toConsumableArray(new Set(data.map(function (d) {
-      return d.genre;
-    }).filter(Boolean)))).sort();
-    genreSelect.innerHTML = genres.map(function (genre) {
-      return "<option value=\"".concat(genre, "\">").concat(genre, "</option>");
-    }).join('');
-  }
-
-  // Artist filter
   var artistSelect = document.getElementById('artist');
-  if (artistSelect) {
-    var artists = ['All Artists'].concat(_toConsumableArray(new Set(data.map(function (d) {
-      return d.artist_name;
-    }).filter(Boolean)))).sort();
-    artistSelect.innerHTML = artists.map(function (artist) {
-      return "<option value=\"".concat(artist, "\">").concat(artist, "</option>");
-    }).join('');
-  }
-
-  // Date range inputs
   var startDate = document.getElementById('start-date');
   var endDate = document.getElementById('end-date');
-  if (startDate && endDate) {
-    var validDates = data.map(function (d) {
-      return d.released_date;
-    }).filter(function (d) {
-      return d instanceof Date && !isNaN(d.getTime());
-    }).sort(function (a, b) {
-      return a - b;
-    });
-    if (validDates.length) {
-      startDate.value = formatDate(validDates[0]);
-      endDate.value = formatDate(validDates[validDates.length - 1]);
-    }
-  }
+
+  // Populate filter options
+  var genres = ['All Genres'].concat(_toConsumableArray(new Set(data.map(function (d) {
+    return d.genre;
+  })))).sort();
+  var artists = ['All Artists'].concat(_toConsumableArray(new Set(data.map(function (d) {
+    return d.artist_name;
+  })))).sort();
+  genres.forEach(function (genre) {
+    var option = document.createElement('option');
+    option.value = genre;
+    option.textContent = genre;
+    genreSelect.appendChild(option);
+  });
+  artists.forEach(function (artist) {
+    var option = document.createElement('option');
+    option.value = artist;
+    option.textContent = artist;
+    artistSelect.appendChild(option);
+  });
+
+  // Set initial date range
+  var dates = data.map(function (d) {
+    return d.released_date;
+  }).sort(d3__WEBPACK_IMPORTED_MODULE_0__.ascending);
+  startDate.value = formatDate(dates[0]);
+  endDate.value = formatDate(dates[dates.length - 1]);
 
   // Filter change handler
   function handleFilterChange() {
-    var selectedGenre = genreSelect ? genreSelect.value : 'All Genres';
-    var selectedArtist = artistSelect ? artistSelect.value : 'All Artists';
-    var startDateVal = startDate ? parseDate(startDate.value) : null;
-    var endDateVal = endDate ? parseDate(endDate.value) : null;
+    var selectedGenre = genreSelect.value;
+    var selectedArtist = artistSelect.value;
+    var startDateVal = parseDate(startDate.value);
+    var endDateVal = parseDate(endDate.value);
     var filteredData = data.filter(function (d) {
       var genreMatch = selectedGenre === 'All Genres' || d.genre === selectedGenre;
       var artistMatch = selectedArtist === 'All Artists' || d.artist_name === selectedArtist;
-      var dateMatch = (!startDateVal || d.released_date >= startDateVal) && (!endDateVal || d.released_date <= endDateVal);
+      var dateMatch = d.released_date >= startDateVal && d.released_date <= endDateVal;
       return genreMatch && artistMatch && dateMatch;
     });
 
-    // Update all charts
-    Object.entries(charts).forEach(function (_ref3) {
-      var _ref4 = _slicedToArray(_ref3, 2),
-        key = _ref4[0],
-        chart = _ref4[1];
-      if (chart && typeof chart.update === 'function') {
-        chart.currentData = filteredData;
-        chart.update(filteredData);
-      }
+    // Update all charts with filtered data
+    Object.values(charts).forEach(function (chart) {
+      return chart.update(filteredData);
     });
   }
 
   // Add event listeners
-  if (genreSelect) genreSelect.addEventListener('change', handleFilterChange);
-  if (artistSelect) artistSelect.addEventListener('change', handleFilterChange);
-  if (startDate) startDate.addEventListener('change', handleFilterChange);
-  if (endDate) endDate.addEventListener('change', handleFilterChange);
+  genreSelect.addEventListener('change', handleFilterChange);
+  artistSelect.addEventListener('change', handleFilterChange);
+  startDate.addEventListener('change', handleFilterChange);
+  endDate.addEventListener('change', handleFilterChange);
 
   // Reset filters button
-  var resetButton = document.getElementById('reset-filters');
-  if (resetButton) {
-    resetButton.addEventListener('click', function () {
-      if (genreSelect) genreSelect.value = 'All Genres';
-      if (artistSelect) artistSelect.value = 'All Artists';
-      if (startDate && endDate) {
-        var _validDates = data.map(function (d) {
-          return d.released_date;
-        }).filter(function (d) {
-          return d instanceof Date && !isNaN(d.getTime());
-        }).sort(function (a, b) {
-          return a - b;
-        });
-        if (_validDates.length) {
-          startDate.value = formatDate(_validDates[0]);
-          endDate.value = formatDate(_validDates[_validDates.length - 1]);
-        }
-      }
-      handleFilterChange();
+  document.getElementById('reset-filters').addEventListener('click', function () {
+    genreSelect.value = 'All Genres';
+    artistSelect.value = 'All Artists';
+    startDate.value = formatDate(dates[0]);
+    endDate.value = formatDate(dates[dates.length - 1]);
+    handleFilterChange();
+  });
+}
+
+// Implement the new chart functions
+function createBubbleChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#bubble-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
+  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([0, INNER_WIDTH]);
+  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([INNER_HEIGHT, 0]);
+  var size = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([4, 40]);
+  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleOrdinal(d3__WEBPACK_IMPORTED_MODULE_0__.schemeCategory10);
+  function updateChart(filteredData) {
+    var artistData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
+      return {
+        totalStreams: d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
+          return d.streams;
+        }),
+        avgDanceability: d3__WEBPACK_IMPORTED_MODULE_0__.mean(v, function (d) {
+          return d.danceability;
+        }),
+        songCount: v.length
+      };
+    }, function (d) {
+      return d.artist_name;
+    });
+    var bubbleData = Array.from(artistData, function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+        name = _ref2[0],
+        values = _ref2[1];
+      return _objectSpread({
+        name: name
+      }, values);
+    }).sort(function (a, b) {
+      return b.totalStreams - a.totalStreams;
+    }).slice(0, 20);
+    x.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(bubbleData, function (d) {
+      return d.avgDanceability;
+    })]);
+    y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(bubbleData, function (d) {
+      return d.totalStreams;
+    })]);
+    size.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(bubbleData, function (d) {
+      return d.songCount;
+    })]);
+    var bubbles = svg.selectAll(".bubble").data(bubbleData, function (d) {
+      return d.name;
+    });
+    bubbles.exit().remove();
+    bubbles.enter().append("circle").attr("class", "bubble").merge(bubbles).transition().duration(1000).attr("cx", function (d) {
+      return x(d.avgDanceability);
+    }).attr("cy", function (d) {
+      return y(d.totalStreams);
+    }).attr("r", function (d) {
+      return size(d.songCount);
+    }).attr("fill", function (d) {
+      return color(d.name);
+    }).attr("opacity", 0.7);
+    svg.selectAll(".bubble-label").data(bubbleData, function (d) {
+      return d.name;
+    }).join("text").attr("class", "bubble-label").attr("x", function (d) {
+      return x(d.avgDanceability);
+    }).attr("y", function (d) {
+      return y(d.totalStreams);
+    }).attr("dy", "0.35em").attr("text-anchor", "middle").text(function (d) {
+      return d.name;
+    }).style("font-size", "10px").style("fill", "white");
+    svg.selectAll(".axis").remove();
+    svg.append("g").attr("class", "axis").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x).ticks(5));
+    svg.append("g").attr("class", "axis").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y).ticks(5));
+    svg.append("text").attr("class", "axis-label").attr("x", INNER_WIDTH / 2).attr("y", INNER_HEIGHT + MARGIN.bottom - 10).style("text-anchor", "middle").text("Average Danceability");
+    svg.append("text").attr("class", "axis-label").attr("transform", "rotate(-90)").attr("x", -INNER_HEIGHT / 2).attr("y", -MARGIN.left + 20).style("text-anchor", "middle").text("Total Streams");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+function createSpiderChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#spider-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(CHART_WIDTH / 2, ",").concat(CHART_HEIGHT / 2, ")"));
+  var features = ["danceability", "valence", "energy", "acousticness", "instrumentalness", "liveness", "speechiness"];
+  var radialScale = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().domain([0, 100]).range([0, INNER_WIDTH / 2]);
+  var angleSlice = Math.PI * 2 / features.length;
+  function getPathCoordinates(dataPoint) {
+    return features.map(function (feature, i) {
+      var angle = angleSlice * i;
+      return {
+        x: radialScale(dataPoint[feature]) * Math.cos(angle - Math.PI / 2),
+        y: radialScale(dataPoint[feature]) * Math.sin(angle - Math.PI / 2)
+      };
     });
   }
+  function updateChart(filteredData) {
+    var averageData = features.reduce(function (acc, feature) {
+      acc[feature] = d3__WEBPACK_IMPORTED_MODULE_0__.mean(filteredData, function (d) {
+        return d[feature];
+      });
+      return acc;
+    }, {});
+    svg.selectAll("*").remove();
 
-  // Initial filter application
-  handleFilterChange();
+    // Draw circular grid
+    var circles = [20, 40, 60, 80, 100];
+    svg.selectAll(".circular-grid").data(circles).enter().append("circle").attr("class", "circular-grid").attr("cx", 0).attr("cy", 0).attr("r", function (d) {
+      return radialScale(d);
+    }).attr("fill", "none").attr("stroke", "gray").attr("stroke-dasharray", "4 4");
+
+    // Draw axis
+    features.forEach(function (feature, i) {
+      var angle = angleSlice * i - Math.PI / 2;
+      var lineCoords = {
+        x2: radialScale(100) * Math.cos(angle),
+        y2: radialScale(100) * Math.sin(angle)
+      };
+      svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", lineCoords.x2).attr("y2", lineCoords.y2).attr("stroke", "gray");
+      svg.append("text").attr("x", lineCoords.x2 * 1.1).attr("y", lineCoords.y2 * 1.1).attr("text-anchor", "middle").attr("dominant-baseline", "middle").text(feature);
+    });
+
+    // Draw spider chart
+    var lineGenerator = d3__WEBPACK_IMPORTED_MODULE_0__.line().x(function (d) {
+      return d.x;
+    }).y(function (d) {
+      return d.y;
+    });
+    var coordinates = getPathCoordinates(averageData);
+    svg.append("path").datum(coordinates).attr("d", lineGenerator).attr("stroke-width", 3).attr("stroke", "rgba(34, 197, 94, 0.7)").attr("fill", "rgba(34, 197, 94, 0.2)").attr("stroke-linejoin", "round");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
 }
+function createRadarChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#radar-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(CHART_WIDTH / 2, ",").concat(CHART_HEIGHT / 2, ")"));
+  var features = ["danceability", "valence", "energy", "acousticness", "instrumentalness", "liveness", "speechiness"];
+  var radialScale = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().domain([0, 100]).range([0, INNER_WIDTH / 2]);
+  var angleSlice = Math.PI * 2 / features.length;
+  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleOrdinal(d3__WEBPACK_IMPORTED_MODULE_0__.schemeCategory10);
+  function getPathCoordinates(dataPoint) {
+    return features.map(function (feature, i) {
+      var angle = angleSlice * i;
+      return {
+        x: radialScale(dataPoint[feature]) * Math.cos(angle - Math.PI / 2),
+        y: radialScale(dataPoint[feature]) * Math.sin(angle - Math.PI / 2)
+      };
+    });
+  }
+  function updateChart(filteredData) {
+    var genreData = d3__WEBPACK_IMPORTED_MODULE_0__.group(filteredData, function (d) {
+      return d.genre;
+    });
+    var topGenres = Array.from(genreData, function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+        genre = _ref4[0],
+        songs = _ref4[1];
+      return {
+        genre: genre,
+        totalStreams: d3__WEBPACK_IMPORTED_MODULE_0__.sum(songs, function (s) {
+          return s.streams;
+        })
+      };
+    }).sort(function (a, b) {
+      return b.totalStreams - a.totalStreams;
+    }).slice(0, 5).map(function (d) {
+      return d.genre;
+    });
+    var averageData = topGenres.map(function (genre) {
+      var genreSongs = genreData.get(genre);
+      return _objectSpread({
+        genre: genre
+      }, features.reduce(function (acc, feature) {
+        acc[feature] = d3__WEBPACK_IMPORTED_MODULE_0__.mean(genreSongs, function (d) {
+          return d[feature];
+        });
+        return acc;
+      }, {}));
+    });
+    svg.selectAll("*").remove();
+
+    // Draw circular grid
+    var circles = [20, 40, 60, 80, 100];
+    svg.selectAll(".circular-grid").data(circles).enter().append("circle").attr("class", "circular-grid").attr("cx", 0).attr("cy", 0).attr("r", function (d) {
+      return radialScale(d);
+    }).attr("fill", "none").attr("stroke", "gray").attr("stroke-dasharray", "4 4");
+
+    // Draw axis
+    features.forEach(function (feature, i) {
+      var angle = angleSlice * i - Math.PI / 2;
+      var lineCoords = {
+        x2: radialScale(100) * Math.cos(angle),
+        y2: radialScale(100) * Math.sin(angle)
+      };
+      svg.append("line").attr("x1", 0).attr("y1", 0).attr("x2", lineCoords.x2).attr("y2", lineCoords.y2).attr("stroke", "gray");
+      svg.append("text").attr("x", lineCoords.x2 * 1.1).attr("y", lineCoords.y2 * 1.1).attr("text-anchor", "middle").attr("dominant-baseline", "middle").text(feature);
+    });
+
+    // Draw radar chart for each genre
+    var lineGenerator = d3__WEBPACK_IMPORTED_MODULE_0__.line().x(function (d) {
+      return d.x;
+    }).y(function (d) {
+      return d.y;
+    });
+    averageData.forEach(function (genreData, i) {
+      var coordinates = getPathCoordinates(genreData);
+      svg.append("path").datum(coordinates).attr("d", lineGenerator).attr("stroke-width", 2).attr("stroke", color(i)).attr("fill", color(i)).attr("fill-opacity", 0.1).attr("stroke-linejoin", "round");
+    });
+
+    // Add legend
+    var legend = svg.selectAll(".legend").data(averageData).enter().append("g").attr("class", "legend").attr("transform", function (d, i) {
+      return "translate(".concat(INNER_WIDTH / 2 + 20, ", ").concat(-INNER_HEIGHT / 2 + 20 + i * 20, ")");
+    });
+    legend.append("rect").attr("width", 10).attr("height", 10).attr("fill", function (d, i) {
+      return color(i);
+    });
+    legend.append("text").attr("x", 20).attr("y", 10).text(function (d) {
+      return d.genre;
+    }).style("font-size", "12px").attr("alignment-baseline", "middle");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+
+// Update existing chart functions to use the new data structure
+function createLineChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#line-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
+  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleTime().range([0, INNER_WIDTH]);
+  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([INNER_HEIGHT, 0]);
+  function updateChart(filteredData) {
+    var streamsByDate = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
+      return d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
+        return d.streams;
+      });
+    }, function (d) {
+      return d3__WEBPACK_IMPORTED_MODULE_0__.timeYear(d.released_date);
+    });
+    var lineData = Array.from(streamsByDate, function (_ref5) {
+      var _ref6 = _slicedToArray(_ref5, 2),
+        date = _ref6[0],
+        streams = _ref6[1];
+      return {
+        date: date,
+        streams: streams
+      };
+    }).sort(function (a, b) {
+      return a.date - b.date;
+    });
+    x.domain(d3__WEBPACK_IMPORTED_MODULE_0__.extent(lineData, function (d) {
+      return d.date;
+    }));
+    y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(lineData, function (d) {
+      return d.streams;
+    })]);
+    svg.selectAll("*").remove();
+    svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x));
+    svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
+    var line = d3__WEBPACK_IMPORTED_MODULE_0__.line().x(function (d) {
+      return x(d.date);
+    }).y(function (d) {
+      return y(d.streams);
+    });
+    svg.append("path").datum(lineData).attr("fill", "none").attr("stroke", "steelblue").attr("stroke-width", 1.5).attr("d", line);
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+function createBarChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#bar-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
+  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().range([0, INNER_WIDTH]).padding(0.1);
+  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([INNER_HEIGHT, 0]);
+  function updateChart(filteredData) {
+    var artistStreams = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
+      return d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
+        return d.streams;
+      });
+    }, function (d) {
+      return d.artist_name;
+    });
+    var barData = Array.from(artistStreams, function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2),
+        artist = _ref8[0],
+        streams = _ref8[1];
+      return {
+        artist: artist,
+        streams: streams
+      };
+    }).sort(function (a, b) {
+      return b.streams - a.streams;
+    }).slice(0, 10);
+    x.domain(barData.map(function (d) {
+      return d.artist;
+    }));
+    y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(barData, function (d) {
+      return d.streams;
+    })]);
+    svg.selectAll("*").remove();
+    svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x)).selectAll("text").attr("transform", "rotate(-45)").style("text-anchor", "end");
+    svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
+    svg.selectAll(".bar").data(barData).enter().append("rect").attr("class", "bar").attr("x", function (d) {
+      return x(d.artist);
+    }).attr("width", x.bandwidth()).attr("y", function (d) {
+      return y(d.streams);
+    }).attr("height", function (d) {
+      return INNER_HEIGHT - y(d.streams);
+    }).attr("fill", "#22C55E");
+
+    // Add labels
+    svg.append("text").attr("transform", "translate(".concat(INNER_WIDTH / 2, ", ").concat(INNER_HEIGHT + MARGIN.bottom - 5, ")")).style("text-anchor", "middle").text("Artists");
+    svg.append("text").attr("transform", "rotate(-90)").attr("y", 0 - MARGIN.left).attr("x", 0 - INNER_HEIGHT / 2).attr("dy", "1em").style("text-anchor", "middle").text("Total Streams");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+function createPieChart(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#pie-chart").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(CHART_WIDTH / 2, ",").concat(CHART_HEIGHT / 2, ")"));
+  var radius = Math.min(INNER_WIDTH, INNER_HEIGHT) / 2;
+  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleOrdinal(d3__WEBPACK_IMPORTED_MODULE_0__.schemeCategory10);
+  function updateChart(filteredData) {
+    var genreCounts = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
+      return v.length;
+    }, function (d) {
+      return d.genre;
+    });
+    var pieData = Array.from(genreCounts, function (_ref9) {
+      var _ref10 = _slicedToArray(_ref9, 2),
+        genre = _ref10[0],
+        count = _ref10[1];
+      return {
+        genre: genre,
+        count: count
+      };
+    }).sort(function (a, b) {
+      return b.count - a.count;
+    }).slice(0, 5); // Top 5 genres
+
+    var pie = d3__WEBPACK_IMPORTED_MODULE_0__.pie().value(function (d) {
+      return d.count;
+    }).sort(null);
+    var arc = d3__WEBPACK_IMPORTED_MODULE_0__.arc().innerRadius(0).outerRadius(radius);
+    svg.selectAll("*").remove();
+    var arcs = svg.selectAll("arc").data(pie(pieData)).enter().append("g").attr("class", "arc");
+    arcs.append("path").attr("d", arc).attr("fill", function (d, i) {
+      return color(i);
+    });
+
+    // Add labels
+    arcs.append("text").attr("transform", function (d) {
+      return "translate(".concat(arc.centroid(d), ")");
+    }).attr("text-anchor", "middle").text(function (d) {
+      return d.data.genre;
+    }).style("font-size", "12px").style("fill", "white");
+
+    // Add legend
+    var legend = svg.selectAll(".legend").data(pieData).enter().append("g").attr("class", "legend").attr("transform", function (d, i) {
+      return "translate(".concat(radius + 20, ", ").concat(-radius + 20 + i * 20, ")");
+    });
+    legend.append("rect").attr("width", 10).attr("height", 10).attr("fill", function (d, i) {
+      return color(i);
+    });
+    legend.append("text").attr("x", 20).attr("y", 9).text(function (d) {
+      return "".concat(d.genre, " (").concat(d.count, ")");
+    }).style("font-size", "12px");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+function createScatterPlot(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#scatter-plot").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
+  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([0, INNER_WIDTH]);
+  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleLinear().range([INNER_HEIGHT, 0]);
+  function updateChart(filteredData) {
+    x.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(filteredData, function (d) {
+      return d.duration_ms / 60000;
+    })]); // Convert to minutes
+    y.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(filteredData, function (d) {
+      return d.streams;
+    })]);
+    svg.selectAll("*").remove();
+    svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x));
+    svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
+    svg.selectAll(".dot").data(filteredData).enter().append("circle").attr("class", "dot").attr("cx", function (d) {
+      return x(d.duration_ms / 60000);
+    }).attr("cy", function (d) {
+      return y(d.streams);
+    }).attr("r", 3).style("fill", "#22C55E").style("opacity", 0.7);
+
+    // Add labels
+    svg.append("text").attr("transform", "translate(".concat(INNER_WIDTH / 2, ", ").concat(INNER_HEIGHT + MARGIN.bottom - 5, ")")).style("text-anchor", "middle").text("Song Duration (minutes)");
+    svg.append("text").attr("transform", "rotate(-90)").attr("y", 0 - MARGIN.left).attr("x", 0 - INNER_HEIGHT / 2).attr("dy", "1em").style("text-anchor", "middle").text("Total Streams");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+function createHeatmap(data) {
+  var svg = d3__WEBPACK_IMPORTED_MODULE_0__.select("#heatmap").append("svg").attr("viewBox", "0 0 ".concat(CHART_WIDTH, " ").concat(CHART_HEIGHT)).append("g").attr("transform", "translate(".concat(MARGIN.left, ",").concat(MARGIN.top, ")"));
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var x = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().range([0, INNER_WIDTH]).padding(0.05);
+  var y = d3__WEBPACK_IMPORTED_MODULE_0__.scaleBand().range([INNER_HEIGHT, 0]).padding(0.05);
+  var color = d3__WEBPACK_IMPORTED_MODULE_0__.scaleSequential(d3__WEBPACK_IMPORTED_MODULE_0__.interpolateGreens);
+  function updateChart(filteredData) {
+    var heatmapData = d3__WEBPACK_IMPORTED_MODULE_0__.rollup(filteredData, function (v) {
+      return d3__WEBPACK_IMPORTED_MODULE_0__.sum(v, function (d) {
+        return d.streams;
+      });
+    }, function (d) {
+      return d.genre;
+    }, function (d) {
+      return d.released_date.getMonth();
+    });
+    var genres = Array.from(heatmapData.keys());
+    x.domain(months);
+    y.domain(genres);
+    var allValues = Array.from(heatmapData.values(), function (m) {
+      return Array.from(m.values());
+    }).flat();
+    color.domain([0, d3__WEBPACK_IMPORTED_MODULE_0__.max(allValues)]);
+    svg.selectAll("*").remove();
+
+    // Add X axis
+    svg.append("g").attr("transform", "translate(0,".concat(INNER_HEIGHT, ")")).call(d3__WEBPACK_IMPORTED_MODULE_0__.axisBottom(x));
+
+    // Add Y axis
+    svg.append("g").call(d3__WEBPACK_IMPORTED_MODULE_0__.axisLeft(y));
+
+    // Create the heatmap cells
+    genres.forEach(function (genre) {
+      var genreData = heatmapData.get(genre);
+      svg.selectAll(".cell-".concat(genre)).data(months).enter().append("rect").attr("class", "cell-".concat(genre)).attr("x", function (d) {
+        return x(d);
+      }).attr("y", y(genre)).attr("width", x.bandwidth()).attr("height", y.bandwidth()).style("fill", function (d) {
+        var monthIndex = months.indexOf(d);
+        return color(genreData.get(monthIndex) || 0);
+      });
+    });
+
+    // Add labels
+    svg.append("text").attr("transform", "translate(".concat(INNER_WIDTH / 2, ", ").concat(INNER_HEIGHT + MARGIN.bottom - 5, ")")).style("text-anchor", "middle").text("Month");
+    svg.append("text").attr("transform", "rotate(-90)").attr("y", 0 - MARGIN.left).attr("x", 0 - INNER_HEIGHT / 2).attr("dy", "1em").style("text-anchor", "middle").text("Genre");
+  }
+  updateChart(data);
+  return {
+    update: updateChart
+  };
+}
+
+// Initialize the dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+  initDashboard();
+});
 })();
 
 /******/ })()

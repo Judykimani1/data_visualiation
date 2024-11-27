@@ -35,7 +35,6 @@
         min-height: 400px;
         position: relative;
       }
-
       .tooltip {
         position: absolute;
         padding: 8px;
@@ -124,7 +123,6 @@
 
     <div class="container mx-auto px-4 py-8">
       <div class="flex flex-col lg:flex-row gap-8">
-        <!-- Sidebar -->
         <aside class="lg:w-64 space-y-6 bg-white p-6 rounded-lg shadow-md">
           <h2 class="text-xl font-semibold text-gray-800">Filters</h2>
 
@@ -181,37 +179,60 @@
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Streaming Trends Over Time
               </h2>
-              <div class="loading-state">
+              <div class="loading-state"></div>
             </section>
 
             <section id="bar-chart" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Top Artists by Total Streams
               </h2>
-              <div class="loading-state">
+              <div class="loading-state"></div>
             </section>
 
             <section id="pie-chart" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Genre Distribution
               </h2>
-              <div class="loading-state">
+              <div class="loading-state"></div>
             </section>
 
             <section id="scatter-plot" class="chart-container p-6">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Song Length vs. Total Streams
               </h2>
-              <div class="loading-state">
+              <div class="loading-state"></div>
             </section>
           </div>
 
-          <section id="heatmap" class="chart-container p-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">
-              Monthly Streaming Activity by Genre
-            </h2>
-            <div class="loading-state">
-          </section>
+          <div class="grid md:grid-cols-2 gap-8">
+            <section id="heatmap" class="chart-container p-6">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Monthly Streaming Activity by Genre
+              </h2>
+              <div class="loading-state"></div>
+            </section>
+
+            <section id="bubble-chart" class="chart-container p-6">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Artist Performance Bubble Chart
+              </h2>
+              <div class="loading-state"></div>
+            </section>
+
+            <section id="spider-chart" class="chart-container p-6">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Overall Music Characteristics
+              </h2>
+              <div class="loading-state"></div>
+            </section>
+
+            <section id="radar-chart" class="chart-container p-6">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Genre Music Characteristics
+              </h2>
+              <div class="loading-state"></div>
+            </section>
+          </div>
         </main>
       </div>
     </div>

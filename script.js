@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
 
 // Constants for chart dimensions and margins
-const MARGIN = { top: 40, right: 30, bottom: 60, left: 60 };
-const CHART_WIDTH = 600;
+const MARGIN = { top: 20, right: 20, bottom: 30, left: 40 };
+const CHART_WIDTH = 400;
 const CHART_HEIGHT = 400;
 const INNER_WIDTH = CHART_WIDTH - MARGIN.left - MARGIN.right;
 const INNER_HEIGHT = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
@@ -141,37 +141,70 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
 });
 
-// Filter setup function
+// Function to setup filters with dynamic dropdown population
 function setupFilters(data, charts) {
+    // Get references to dropdown elements
     const genreSelect = document.getElementById('genre');
     const artistSelect = document.getElementById('artist');
     const startDate = document.getElementById('start-date');
     const endDate = document.getElementById('end-date');
 
-    // Populate filter options
-    const genres = ['All Genres', ...new Set(data.map(d => d.genre))].sort();
-    const artists = ['All Artists', ...new Set(data.map(d => d.artist_name))].sort();
+    // Clear existing options first (to prevent duplicates on multiple calls)
+    genreSelect.innerHTML = '';
+    artistSelect.innerHTML = '';
 
+    // Create unique, sorted genre options with counts
+    const genreCounts = data.reduce((acc, d) => {
+        acc[d.genre] = (acc[d.genre] || 0) + 1;
+        return acc;
+    }, {});
+
+    const genres = Object.keys(genreCounts).sort((a, b) =>
+        genreCounts[b] - genreCounts[a] // Sort by descending count
+    );
+
+    // Create unique, sorted artist options with counts
+    const artistCounts = data.reduce((acc, d) => {
+        acc[d.artist_name] = (acc[d.artist_name] || 0) + 1;
+        return acc;
+    }, {});
+
+    const artists = Object.keys(artistCounts).sort((a, b) =>
+        artistCounts[b] - artistCounts[a] // Sort by descending count
+    );
+
+    // Add default "All" options first
+    const addDefaultOption = (select, defaultText) => {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = defaultText;
+        defaultOption.textContent = defaultText;
+        select.appendChild(defaultOption);
+    };
+
+    addDefaultOption(genreSelect, 'All Genres');
+    addDefaultOption(artistSelect, 'All Artists');
+
+    // Populate genre dropdown with options and track counts
     genres.forEach(genre => {
         const option = document.createElement('option');
         option.value = genre;
-        option.textContent = genre;
+        option.textContent = `${genre} (${genreCounts[genre]})`;
         genreSelect.appendChild(option);
     });
 
+    // Populate artist dropdown with options and track counts
     artists.forEach(artist => {
         const option = document.createElement('option');
         option.value = artist;
-        option.textContent = artist;
+        option.textContent = `${artist} (${artistCounts[artist]})`;
         artistSelect.appendChild(option);
     });
 
-    // Set initial date range
     const dates = data.map(d => d.released_date).sort(d3.ascending);
     startDate.value = formatDate(dates[0]);
     endDate.value = formatDate(dates[dates.length - 1]);
 
-    // Filter change handler
+    // Filtering logic
     function handleFilterChange() {
         const selectedGenre = genreSelect.value;
         const selectedArtist = artistSelect.value;

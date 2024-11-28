@@ -33828,26 +33828,22 @@ function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" 
 function _toPrimitive(t, r) { if ("object" != _typeof(t) || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != _typeof(i)) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 function _slicedToArray(r, e) { return _arrayWithHoles(r) || _iterableToArrayLimit(r, e) || _unsupportedIterableToArray(r, e) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
+function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function _iterableToArrayLimit(r, l) { var t = null == r ? null : "undefined" != typeof Symbol && r[Symbol.iterator] || r["@@iterator"]; if (null != t) { var e, n, i, u, a = [], f = !0, o = !1; try { if (i = (t = t.call(r)).next, 0 === l) { if (Object(t) !== t) return; f = !1; } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0); } catch (r) { o = !0, n = r; } finally { try { if (!f && null != t["return"] && (u = t["return"](), Object(u) !== u)) return; } finally { if (o) throw n; } } return a; } }
 function _arrayWithHoles(r) { if (Array.isArray(r)) return r; }
-function _toConsumableArray(r) { return _arrayWithoutHoles(r) || _iterableToArray(r) || _unsupportedIterableToArray(r) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(r, a) { if (r) { if ("string" == typeof r) return _arrayLikeToArray(r, a); var t = {}.toString.call(r).slice(8, -1); return "Object" === t && r.constructor && (t = r.constructor.name), "Map" === t || "Set" === t ? Array.from(r) : "Arguments" === t || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray(r, a) : void 0; } }
-function _iterableToArray(r) { if ("undefined" != typeof Symbol && null != r[Symbol.iterator] || null != r["@@iterator"]) return Array.from(r); }
-function _arrayWithoutHoles(r) { if (Array.isArray(r)) return _arrayLikeToArray(r); }
-function _arrayLikeToArray(r, a) { (null == a || a > r.length) && (a = r.length); for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e]; return n; }
 function asyncGeneratorStep(n, t, e, r, o, a, c) { try { var i = n[a](c), u = i.value; } catch (n) { return void e(n); } i.done ? t(u) : Promise.resolve(u).then(r, o); }
 function _asyncToGenerator(n) { return function () { var t = this, e = arguments; return new Promise(function (r, o) { var a = n.apply(t, e); function _next(n) { asyncGeneratorStep(a, r, o, _next, _throw, "next", n); } function _throw(n) { asyncGeneratorStep(a, r, o, _next, _throw, "throw", n); } _next(void 0); }); }; }
 
 
 // Constants for chart dimensions and margins
 var MARGIN = {
-  top: 40,
-  right: 30,
-  bottom: 60,
-  left: 60
+  top: 20,
+  right: 20,
+  bottom: 30,
+  left: 40
 };
-var CHART_WIDTH = 600;
+var CHART_WIDTH = 400;
 var CHART_HEIGHT = 400;
 var INNER_WIDTH = CHART_WIDTH - MARGIN.left - MARGIN.right;
 var INNER_HEIGHT = CHART_HEIGHT - MARGIN.top - MARGIN.bottom;
@@ -34017,41 +34013,70 @@ document.addEventListener('DOMContentLoaded', function () {
   initDashboard();
 });
 
-// Filter setup function
+// Function to setup filters with dynamic dropdown population
 function setupFilters(data, charts) {
+  // Get references to dropdown elements
   var genreSelect = document.getElementById('genre');
   var artistSelect = document.getElementById('artist');
   var startDate = document.getElementById('start-date');
   var endDate = document.getElementById('end-date');
 
-  // Populate filter options
-  var genres = ['All Genres'].concat(_toConsumableArray(new Set(data.map(function (d) {
-    return d.genre;
-  })))).sort();
-  var artists = ['All Artists'].concat(_toConsumableArray(new Set(data.map(function (d) {
-    return d.artist_name;
-  })))).sort();
+  // Clear existing options first (to prevent duplicates on multiple calls)
+  genreSelect.innerHTML = '';
+  artistSelect.innerHTML = '';
+
+  // Create unique, sorted genre options with counts
+  var genreCounts = data.reduce(function (acc, d) {
+    acc[d.genre] = (acc[d.genre] || 0) + 1;
+    return acc;
+  }, {});
+  var genres = Object.keys(genreCounts).sort(function (a, b) {
+    return genreCounts[b] - genreCounts[a];
+  } // Sort by descending count
+  );
+
+  // Create unique, sorted artist options with counts
+  var artistCounts = data.reduce(function (acc, d) {
+    acc[d.artist_name] = (acc[d.artist_name] || 0) + 1;
+    return acc;
+  }, {});
+  var artists = Object.keys(artistCounts).sort(function (a, b) {
+    return artistCounts[b] - artistCounts[a];
+  } // Sort by descending count
+  );
+
+  // Add default "All" options first
+  var addDefaultOption = function addDefaultOption(select, defaultText) {
+    var defaultOption = document.createElement('option');
+    defaultOption.value = defaultText;
+    defaultOption.textContent = defaultText;
+    select.appendChild(defaultOption);
+  };
+  addDefaultOption(genreSelect, 'All Genres');
+  addDefaultOption(artistSelect, 'All Artists');
+
+  // Populate genre dropdown with options and track counts
   genres.forEach(function (genre) {
     var option = document.createElement('option');
     option.value = genre;
-    option.textContent = genre;
+    option.textContent = "".concat(genre, " (").concat(genreCounts[genre], ")");
     genreSelect.appendChild(option);
   });
+
+  // Populate artist dropdown with options and track counts
   artists.forEach(function (artist) {
     var option = document.createElement('option');
     option.value = artist;
-    option.textContent = artist;
+    option.textContent = "".concat(artist, " (").concat(artistCounts[artist], ")");
     artistSelect.appendChild(option);
   });
-
-  // Set initial date range
   var dates = data.map(function (d) {
     return d.released_date;
   }).sort(d3__WEBPACK_IMPORTED_MODULE_0__.ascending);
   startDate.value = formatDate(dates[0]);
   endDate.value = formatDate(dates[dates.length - 1]);
 
-  // Filter change handler
+  // Filtering logic
   function handleFilterChange() {
     var selectedGenre = genreSelect.value;
     var selectedArtist = artistSelect.value;
